@@ -1,3 +1,6 @@
-vscode:
-  extensions:
-    - ritwickdey.liveserver@5.6.1:5Mhl1RgVVDcIym163x8r+w==
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - init: 'echo "TODO: Replace with init/build command"'
+    command: 'echo "TODO: Replace with command to start project"'
