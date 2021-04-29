@@ -47,9 +47,8 @@ var init = function (window) {
         function update() {
             // TODO 4 : Update the circle's position //
             for (var count = 0; count <= 100; count ++) {
-            var iCircle = count
-            physikz.updatePosition(circles[iCircle]);
-            physikz.checkCirclePosition(circles[iCircle]);
+            physikz.updatePosition(circles[count]);
+            physikz.checkCirclePosition(circles[count]);
             }
             
             // TODO 5 : Call game.checkCirclePosition() on your circles.
