@@ -1,5 +1,5 @@
 /* global $, sessionStorage */
-<script src="jace-robin.github.io/keycodescript.js">
+@import "/keycodescript.js"
 $(document).ready(runProgram); // wait for the HTML / CSS elements of the page to fully load, then execute runProgram()
   
 function runProgram(){
@@ -33,11 +33,11 @@ function runProgram(){
   */
   function handleKeyDown(event) {
     var keyPressed = keycodes[event - 1];
-
+    console.log ("key" + keyPressed + "pressed");
   }
   function handleKeyUp(event) {
     var keyReleased = keycodes[event - 1];
-
+    console.log ("Key" + keyReleased + "released");
   }
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
