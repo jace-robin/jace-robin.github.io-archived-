@@ -1,5 +1,5 @@
 /* global $, sessionStorage */
-
+<script src="jace-robin.github.io/keycodescript.js"> </script>
 $(document).ready(runProgram); // wait for the HTML / CSS elements of the page to fully load, then execute runProgram()
   
 function runProgram(){
@@ -16,8 +16,8 @@ function runProgram(){
 
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
-  $(document).on('eventType', handleEvent);                           // change 'eventType' to the type of event you want to handle
-
+  $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle
+  $(document).on('keyup', handleKeyUp)
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -27,22 +27,40 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    
-
-  }
-  
+   
   /* 
   Called in response to events.
   */
-  function handleEvent(event) {
+  function handleKeyDown(event) {
+    var keyPressed = keycodes[event - 1];
 
   }
+  function handleKeyUp(event) {
+    var keyReleased = keycodes[event - 1];
 
+  }
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
 
-  
+  function reduceSpeed (ROD) {
+        if (speedX < 0) {
+            speedX += ROD;
+        }
+        else if (speedX > 0) {
+            speedX -= ROD;
+        };
+
+        if (speedY < 0) {
+            speedY += ROD;
+        }
+        else if (speedY > 0) {
+            speedY -= ROD;
+        };
+  };
+  function collision () {
+        if (positionX <= canvas.)
+  }
   function endGame() {
     // stop the interval timer
     clearInterval(interval);
