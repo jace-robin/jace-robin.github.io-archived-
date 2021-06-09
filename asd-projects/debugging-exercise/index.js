@@ -102,7 +102,7 @@ function update(){
         // redraw the circle on the screen after it moves
         updateCircleOnScreen(circle);
     }
-}
+};
 
 //////////////////////////
 // update helper functions
@@ -135,14 +135,12 @@ function bounceCircle(circle){
     // this bounces off the bottom wall
     else if (circle.y > boardHeight){
         circle.y -= circle.speedY;
-        circle.speedX *= -1;
+        circle.speedY *= -1;
     }
 }
 
 // this redraws the circle's position on the screen
 function updateCircleOnScreen(circle){
-    maxCircles = 0;
-
     // these lines redraw the circle's position
     $(circle.id).css('left', circle.x);
     $(circle.id).css('top', circle.y);

@@ -17,7 +17,7 @@ function runProgram(){
 
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
-  $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle
+  $(document).on("keydown", handleKeyDown);                           // change 'eventType' to the type of event you want to handle
   //$(document).on('keyup', handleKeyUp)
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
@@ -33,7 +33,7 @@ function runProgram(){
   Called in response to events.
   */
   function handleKeyDown(event) {
-    console.log (event);
+    console.log(event.which);
   }
   /*function handleKeyUp(event) {
     console.log (event);
