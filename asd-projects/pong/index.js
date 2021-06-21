@@ -52,9 +52,9 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    handlePlayer();
-    handleEnemy();
-    handleBall();
+    changePosition(player);
+    //handleEnemy();
+    //handleBall();
     updateScreen();
   }
 
@@ -65,16 +65,15 @@ function runProgram(){
     var key = keycodes[event.which - 1];
     if (!keysHeld.includes(key)) {
       keysHeld.push(key);
-      console.log(keysHeld);
     }
   };
   function handleKeyUp(event) {
     var key = keycodes[event.which - 1];
     if (keysHeld.includes(key)) {
       keysHeld.splice(keysHeld.indexOf(key), 1);
-      console.log(keysHeld);
         }
     };
+
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -83,11 +82,19 @@ function runProgram(){
     if (keysHeld.includes("up")) {
       player.speedX = -5
     }
+    if (keysHeld.includes("down")) {
+      player.speedX = 5
+    }
   };
-
+  function changePosition(object) {
+    object.y += object.speedY;
+    object.x += object.speedX;
+  }
   function updateScreen() {
+    //i know changing the x is not used by the paddles, but is good to have for the ball
     moveObject(player.id, player.x, player.y);
     moveObject(enemy.id, enemy.x, enemy.y);
+    moveObject(ball.id, ball.x, ball.y);
   }
   function moveObject (object, x, y) {
     $(object).css("left", x);
