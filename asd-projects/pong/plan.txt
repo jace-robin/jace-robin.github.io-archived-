@@ -1,0 +1,4 @@
+Gameplay: Move a paddle up and down to compete against an opponent to score points
+Start Coditions: 0 points
+End Condition: ball collides with either the right or left side of the screen. Point given. 5 points for either side ends game and resets.
+If Conditions: if Colliding
