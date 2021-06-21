@@ -3,7 +3,13 @@ body {
   background-color: darkgreen;
 }
 #ball {
-  color:blueviolet
+  border-radius: 50px;
+  background-color: whitesmoke;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+/*   left: 100px; */  /* Uncomment if you want to set a "starting" position */
+/*   top: 100px;  */  /* Uncomment if you want to set a "starting" position */
 }
 #board {
   width: 440px;
@@ -12,17 +18,19 @@ body {
   background-color: black;
   position: relative;
 }
-.paddle {
-  background-color: teal;
+#player {
+  background-color: blue;
   width: 50px;
   height: 50px;
   position: absolute;
 /*   left: 100px; */  /* Uncomment if you want to set a "starting" position */
 /*   top: 100px;  */  /* Uncomment if you want to set a "starting" position */
-};
-#player {
-  color: greenyellow
 }
 #enemy {
-  color: lightseagreen;
+  background-color: red;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+/*   left: 100px; */  /* Uncomment if you want to set a "starting" position */
+/*   top: 100px;  */  /* Uncomment if you want to set a "starting" position */
 }

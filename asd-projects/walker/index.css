@@ -20,7 +20,3 @@ body {
 /*   left: 100px; */  /* Uncomment if you want to set a "starting" position */
 /*   top: 100px;  */  /* Uncomment if you want to set a "starting" position */
 }
-#keysPressed {
-  color: rgb(0, 0, 0);
-  border-bottom: 10%;
-}
