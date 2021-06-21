@@ -52,7 +52,7 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    changePosition(player);
+    handlePlayer();
     //handleEnemy();
     //handleBall();
     updateScreen();
@@ -80,11 +80,15 @@ function runProgram(){
   //FINISH THIS TMMRW MORNING, JUST ADD THE 
   function handlePlayer() {
     if (keysHeld.includes("up")) {
-      player.speedX = -5
+      player.speedY = -10
     }
-    if (keysHeld.includes("down")) {
-      player.speedX = 5
+    else if (keysHeld.includes("down")) {
+      player.speedY = 10
     }
+    else {
+      player.speedY = 0
+    }
+    changePosition(player);
   };
   function changePosition(object) {
     object.y += object.speedY;
