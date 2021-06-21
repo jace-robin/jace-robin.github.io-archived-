@@ -20,29 +20,40 @@ function runProgram(){
 }
   // Game Item Objects
   var keysHeld = [];
-  var player = {
-    id: "#player",
+  var enemy = {
+    id: "#enemy",
     x: 10,
     y: 220,
     speedX: 0,
     speedY: 0,
+    type: "paddle",
   }
-  var enemy = {
-    id: "#enemy",
+  var player = {
+    id: "#player",
     x: 430,
     y: 220,
     speedX: 0,
     speedY: 0,
+    type: "paddle",
+  }
+  var ball = {
+    id: "ball",
+    x: 200,
+    y: 200,
+    speedX: 0,
+    speedY: 0,
+    type: ball,
   }
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
   $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle 
   $(document).on('keyup', handleKeyUp); 
   //spawn positioning
-  player.x = 10; 
-  player.y = 220;
-  enemy.x = 380;
+  enemy.x = 10; 
   enemy.y = 220;
+  player.x = 380;
+  player.y = 220;
+  ball.x;
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -90,9 +101,19 @@ function runProgram(){
     }
     changePosition(player);
   };
+  function handleEnemy() {
+    enemy.x = ball.x;
+    enemy.y = ball.y;
+  }
+  function handleCollisions (obj1, obj2) {
+
+  }
   function changePosition(object) {
     object.y += object.speedY;
     object.x += object.speedX;
+    if (object.type === "paddle") {
+      
+    };
   }
   function updateScreen() {
     //i know changing the x is not used by the paddles, but is good to have for the ball
@@ -104,13 +125,14 @@ function runProgram(){
     $(object).css("left", x);
     $(object).css("top", y);
   };
-  /*function findSides (object) {
-    object.boundary = {
-      right,
+  function findSides (object) {
+    object.sides = {
+      right: object.x
       left,
       top,
       bottom,
     }
+    return
   };*/
   function endGame() {
     // stop the interval timer
