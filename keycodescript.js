@@ -1,14 +1,3 @@
-document.onkeydown = checkKeycode
-
-function checkKeycode(e) {
-var keycode;
-if (window.event)
-	{keycode = window.event.keyCode;}
-else if (e)
-	{keycode = e.which;}
-alert("keycode: " + keycodes[e]);
-}
-
 var keycodesObject =
 [
 "~", 
