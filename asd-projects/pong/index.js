@@ -12,6 +12,8 @@ function runProgram(){
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
   var boardWidth = parseFloat($("#board").css("width"));
   var boardHeight = parseFloat($("#board").css("height"));
+  console.log(boardWidth);
+  console.log(boardHeight);
   var gameInfo = {
     paddleSpeed: 10,
     ballSpeed: 15,
@@ -26,6 +28,8 @@ function runProgram(){
     y: undefined,
     speedX: 0,
     speedY: 0,
+    width: parseFloat($('#enemy').css('width')),
+    height: parseFloat($('#enemy').css('height')),
     type: 'paddle',
   }
   var player = {
@@ -34,6 +38,8 @@ function runProgram(){
     y: undefined,
     speedX: 0,
     speedY: 0,
+    width: parseFloat($('#player').css('width')),
+    height: parseFloat($('#player').css('height')),
     type: 'paddle',
   }
   var ball = {
@@ -42,6 +48,8 @@ function runProgram(){
     y: undefined,
     speedX: 0,
     speedY: 0,
+    width: parseFloat($('#ball').css('width')),
+    height: parseFloat($('#ball').css('height')),
     type: 'ball',
   }
   // one-time setup
@@ -49,12 +57,7 @@ function runProgram(){
   $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle 
   $(document).on('keyup', handleKeyUp); 
   //spawn positioning
-  enemy.x = 25; 
-  enemy.y = 220;
-  player.x = 415;
-  player.y = 220;
-  ball.x = boardWidth / 2;
-  ball.y = boardHeight / 2;
+  spawn();
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +70,8 @@ function runProgram(){
     handlePlayer();
     handleBall();
     handleEnemy();
+    handleCollisions(player, ball);
+    handleCollisions(enemy, ball);
     updateScreen();
   }
 
@@ -90,6 +95,19 @@ function runProgram(){
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   //FINISH THIS TMMRW MORNING, JUST ADD THE 
+  function spawn () {
+    enemy.x = 25; 
+    enemy.y = 220;
+    player.x = 415;
+    player.y = 220;
+    ball.x = boardWidth / 2 + ball.width / 2;
+    ball.y = boardHeight / 2 + ball.height / 2;
+    ball.speedX = 1;
+    ball.speedY = 1;
+    changePosition(ball);
+    changePosition(player);
+    changePosition(enemy);
+    }
   function handlePlayer() {
     if (keysHeld.includes("up")) {
       player.speedY = -10
@@ -101,31 +119,29 @@ function runProgram(){
       player.speedY = 0
     }
     changePosition(player);
-    handleCollisions(player, ball);
   };
   function handleEnemy() {
     //enemy.x = ball.x;
     enemy.y = ball.y;
     changePosition(enemy);
-    handleCollisions(enemy, ball)
   }
   function handleBall() {
-    ball.y = player.y;
-    handleCollisions ()
+    bounceBall ();
     changePosition(ball);
-  }
+  };
   function handleCollisions (obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
-    if (obj1.sides.left >= obj2.sides.right || obj1.sides.top <= obj2.sides.bottom || obj1.sides.bottom >= obj2.sides.top || obj1.sides.right <= obj2.sides.left) {
-      if (obj1.id === "#ball") {
+    if (obj1.sides.left < obj2.sides.right && obj1.sides.right < obj2.sides.left || obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
+      if (obj2.id === "#ball") {
         bounceBall();
       }
     }
-  }
+    changePosition(ball)
+  };
   function bounceBall () {
-    ball.speedX = ball.speedX * Math.min(-3, Math.round(Math.random() * 3) * -1);
-    ball.speedY = ball.speedY * Math.min(-3, Math.round(Math.random() * 3) * -1);
+    ball.speedX = ball.speedX /* * Math.max(-3, Math.round(Math.random() * 2) */ * -1;
+    ball.speedY = ball.speedY /* * Math.max(-3, Math.round(Math.random() * 2) */ * -1;
   }
   function changePosition(object) {
     object.y += object.speedY;
@@ -146,10 +162,10 @@ function runProgram(){
   };
   function findSides (object) {
     object.sides = {
-      right: parseFloat($(object).css('width')),
+      right: object.x + object.width,
       left: object.x,
       top: object.y,
-      bottom: parseFloat($(object).css('height')),
+      bottom: object.x + object.height,
     }
   };
   function endGame() {
