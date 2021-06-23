@@ -56,6 +56,7 @@ function runProgram(){
    //reduceSpeed(rateOfDecrease);
    //collision()
    updateData();
+   logPosition();
   }
   /* 
   Called in response to events.
@@ -137,17 +138,17 @@ function runProgram(){
   //new input system for multiple input registration
   if (Math.abs(player1.speed.x) < 10) {
     if (keysHeld.includes("left") === true) {
-      player1.speed.x -= maxSpeed;
+      player1.speed.x -= 3;
         }
     else if (keysHeld.includes("right") === true) {
-      player1.speed.x += maxSpeed;
+      player1.speed.x += 3;
         }
   if (Math.abs(player1.speed.y) < 10) {
     if (keysHeld.includes("up") === true) {
-      player1.speed.y += maxSpeed;
+      player1.speed.y += 3;
       }
     else if (keysHeld.includes("down") === true) {
-      player1.speed.y -= maxSpeed;
+      player1.speed.y -= 3;
       }
     }
 }
@@ -188,6 +189,11 @@ function runProgram(){
     //collision();
     redrawPosition();
     //consoleLogPosition();
+  }
+  function logPosition() {
+    if (player1.speed.x || player1.speed.y) {
+      console.log (player1.pos.x + ',' + player1.pos.y);
+    }
   }
   function redrawPosition () {
     /*var x = player1.pos.x;

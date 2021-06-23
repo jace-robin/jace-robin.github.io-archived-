@@ -10,8 +10,8 @@ function runProgram(){
   // Constant Variables
   var FRAME_RATE = 60;
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
-  var boardWidth = $("#board").css("width");
-  var boardHeight = $("#board").css("height");
+  var boardWidth = parseFloat($("#board").css("width"));
+  var boardHeight = parseFloat($("#board").css("height"));
   var gameInfo = {
     paddleSpeed: 10,
     ballSpeed: 15,
@@ -22,38 +22,39 @@ function runProgram(){
   var keysHeld = [];
   var enemy = {
     id: "#enemy",
-    x: 10,
-    y: 220,
+    x: undefined,
+    y: undefined,
     speedX: 0,
     speedY: 0,
-    type: "paddle",
+    type: 'paddle',
   }
   var player = {
     id: "#player",
-    x: 430,
-    y: 220,
+    x: undefined,
+    y: undefined,
     speedX: 0,
     speedY: 0,
-    type: "paddle",
+    type: 'paddle',
   }
   var ball = {
-    id: "ball",
-    x: 200,
-    y: 200,
+    id: "#ball",
+    x: undefined,
+    y: undefined,
     speedX: 0,
     speedY: 0,
-    type: ball,
+    type: 'ball',
   }
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
   $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle 
   $(document).on('keyup', handleKeyUp); 
   //spawn positioning
-  enemy.x = 10; 
+  enemy.x = 25; 
   enemy.y = 220;
-  player.x = 380;
+  player.x = 415;
   player.y = 220;
-  ball.x;
+  ball.x = boardWidth / 2;
+  ball.y = boardHeight / 2;
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +65,8 @@ function runProgram(){
   */
   function newFrame() {
     handlePlayer();
-    //handleEnemy();
-    //handleBall();
+    handleBall();
+    handleEnemy();
     updateScreen();
   }
 
@@ -100,13 +101,31 @@ function runProgram(){
       player.speedY = 0
     }
     changePosition(player);
+    handleCollisions(player, ball);
   };
   function handleEnemy() {
-    enemy.x = ball.x;
+    //enemy.x = ball.x;
     enemy.y = ball.y;
+    changePosition(enemy);
+    handleCollisions(enemy, ball)
+  }
+  function handleBall() {
+    ball.y = player.y;
+    handleCollisions ()
+    changePosition(ball);
   }
   function handleCollisions (obj1, obj2) {
-
+    findSides(obj1);
+    findSides(obj2);
+    if (obj1.sides.left >= obj2.sides.right || obj1.sides.top <= obj2.sides.bottom || obj1.sides.bottom >= obj2.sides.top || obj1.sides.right <= obj2.sides.left) {
+      if (obj1.id === "#ball") {
+        bounceBall();
+      }
+    }
+  }
+  function bounceBall () {
+    ball.speedX = ball.speedX * Math.min(-3, Math.round(Math.random() * 3) * -1);
+    ball.speedY = ball.speedY * Math.min(-3, Math.round(Math.random() * 3) * -1);
   }
   function changePosition(object) {
     object.y += object.speedY;
@@ -127,13 +146,12 @@ function runProgram(){
   };
   function findSides (object) {
     object.sides = {
-      right: object.x
-      left,
-      top,
-      bottom,
+      right: parseFloat($(object).css('width')),
+      left: object.x,
+      top: object.y,
+      bottom: parseFloat($(object).css('height')),
     }
-    return
-  };*/
+  };
   function endGame() {
     // stop the interval timer
     clearInterval(interval);
