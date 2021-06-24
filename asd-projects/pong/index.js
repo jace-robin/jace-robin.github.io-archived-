@@ -100,7 +100,9 @@ function runProgram(){
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
-  //FINISH THIS TMMRW MORNING, JUST ADD THE 
+  
+  
+  //called at the start of the game and after a point is scored
   function spawn () {
     enemy.x = board.x + enemy.width; 
     enemy.y = 220;
@@ -121,6 +123,8 @@ function runProgram(){
     $("#enemypoints").text('Enemy Points: ' + enemy.points);
     finishGame();
     }
+
+//handles player movement and key presses
     function handlePlayer() {
     if (keysHeld.includes("up")) {
       player.speedY = -10
@@ -133,23 +137,24 @@ function runProgram(){
     }
     changePosition(player);
   };
+//handles enemy movement
   function handleEnemy() {
-    //enemy.x = ball.x;
-    enemy.y = ball.y;
-    changePosition(enemy);
-  }
-  function handleBall() {
-    /*let ballSpeedTotal = Math.abs(ball.speedX) + Math.abs(ball.speedY);
-    if (ballSpeedTotal < 4 && ballSpeedTotal > -4) {
-            console.log("stuck");
-      ball.speedY = Math.round((Math.random() * 8) - 4) * -1;
-      ball.speedX = Math.round((Math.random() * 8) - 4) * -1;
+    if (enemy.y < ball.y) {
+      enemy.speedY = 3;
+    }
+    else if (enemy.y > ball.y) {
+      enemy.speedY = -3;
     }
     else {
-      //console.log ("unstuck");
-    }*/
+      enemy.speedY = 0;
+    }
+    changePosition(enemy);
+  }
+//handles the balls movement
+  function handleBall() {
     changePosition(ball);
   };
+//called after every round to check if there is a winner
   function finishGame () {
     if (player.points === 11) {
       console.log('PLAYER WINS');
@@ -158,9 +163,11 @@ function runProgram(){
       console.log("ENEMY WINS")
     }
   }
+//handles the meat of this program, uses the sides of both objects to see whether or not it has collided
   function handleCollisions (obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
+//if colliding with player
     if (obj2.id === "#player") {
       if (obj1.sides.right > obj2.sides.left) {
         if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
@@ -169,6 +176,7 @@ function runProgram(){
       }
     }
   }
+//if colliding with enemy
     if (obj2.id === "#enemy") {
     if (obj1.sides.left < obj2.sides.right) {
       if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
@@ -177,6 +185,7 @@ function runProgram(){
     }
   }
 };
+//if colliding with board, check if either roof||floor, or side wall, and if so give a point to the appropriate side
     if (obj2.id === "#board") {
     if (obj1.sides.bottom > obj2.sides.bottom || obj1.sides.top < obj2.sides.top) {
       console.log("collided with roof/floor");
@@ -194,22 +203,23 @@ function runProgram(){
     }
   }
 };
+//bounce the ball a random amount, uses posneg to find if the ball is travelling left or right to make sure it travels opposite on bounce
   function bounceBall () {
     var i = findPosNeg();
-    ball.speedY = Math.round((Math.random() * 3) + 2) * (-1 * i);
-    ball.speedX = Math.round((Math.random() * 3) + 2) * (-1 * i);
+    ball.speedX = Math.round((Math.random() * 5) + 4) * (-1 * i);
+    ball.speedY = 10 - ball.speedX * (-1 * i);
     console.log("bouncy bouncy");
-    if (ball.speedX > 4) {
-      ball.speedX = 4;
+    if (ball.speedX > 8) {
+      ball.speedX = 8;
     }
-    else if (ball.speedX < -4) {
-      ball.speedX = -4;
+    else if (ball.speedX < -8) {
+      ball.speedX = -8;
     };
-    if (ball.speedY > 4) {
-      ball.speedY = 4;
+    if (ball.speedY > 8) {
+      ball.speedY = 8;
     }
-    else if (ball.speedY < -4) {
-      ball.speedY = -4;
+    else if (ball.speedY < -8) {
+      ball.speedY = -8;
     };
   }
   function changePosition(object) {
@@ -220,17 +230,21 @@ function runProgram(){
     };
   }
   function updateScreen() {
-    //i know changing the x is not used by the paddles, but is good to have for the ball
-    //disregard prev comment, removed the x and y parameters in moveObject
+    /*i know changing the x is not used by the paddles, but is good to have for the ball
+    disregard prev comment, removed the x and y parameters in moveObject*/
+    
+    //used to bunch all objects together and move with one script at the end of the call stack 
     moveObject(player);
     moveObject(enemy);
     moveObject(ball);
   }
   function resetScene () {
+    //called when a point is given, calls the spawn function to reposition and reset the ball, enemy, and player
     spawn();
 
   }
   function findPosNeg () {
+    //finds if travelling left or right and returns 1 or -1 to tell which direction to bounce in
       if (ball.speedX > 0) {
         return 1;
       }
@@ -239,10 +253,12 @@ function runProgram(){
       }
     };
   function moveObject (object) {
+    //use jquery to reposition the selected object on screen
     $(object.id).css("left", object.x);
     $(object.id).css("top", object.y);
   };
   function findSides (object) {
+    //find the sides of any given object by using its width, height, x, and y
     object.sides = {
       right: object.x + object.width,
       left: object.x,
@@ -258,4 +274,4 @@ function runProgram(){
     $(document).off();
   }
 }
-//remember velkhana (6/16/21)
+//velkhana
