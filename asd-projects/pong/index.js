@@ -119,6 +119,7 @@ function runProgram(){
     updateScreen();
     $("#playerpoints").text('Player Points: ' + player.points);
     $("#enemypoints").text('Enemy Points: ' + enemy.points);
+    finishGame();
     }
     function handlePlayer() {
     if (keysHeld.includes("up")) {
@@ -149,6 +150,14 @@ function runProgram(){
     }*/
     changePosition(ball);
   };
+  function finishGame () {
+    if (player.points === 11) {
+      console.log('PLAYER WINS');
+    }
+    else if (enemy.points === 11) {
+      console.log("ENEMY WINS")
+    }
+  }
   function handleCollisions (obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
@@ -157,7 +166,6 @@ function runProgram(){
         if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
           console.log("collided with player");
           bounceBall();
-          
       }
     }
   }
@@ -166,10 +174,9 @@ function runProgram(){
       if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
         console.log("collided with enemy");
         bounceBall();
-        
     }
   }
-}
+};
     if (obj2.id === "#board") {
     if (obj1.sides.bottom > obj2.sides.bottom || obj1.sides.top < obj2.sides.top) {
       console.log("collided with roof/floor");
