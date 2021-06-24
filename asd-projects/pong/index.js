@@ -14,38 +14,43 @@ function runProgram(){
   var boardHeight = parseFloat($("#board").css("height"));
   console.log(boardWidth);
   console.log(boardHeight);
-  var gameInfo = {
-    paddleSpeed: 10,
-    ballSpeed: 15,
-    screen: {
-  }
-}
   // Game Item Objects
   var keysHeld = [];
+  var posneg;
+  var board = {
+    id: "#board",
+    x: 0,
+    y: 0,
+    height: boardHeight,
+    width: boardWidth,
+    type: "board",
+  }
   var enemy = {
     id: "#enemy",
-    x: undefined,
-    y: undefined,
+    x: 0,
+    y: 0,
     speedX: 0,
     speedY: 0,
+    points: 0,
     width: parseFloat($('#enemy').css('width')),
     height: parseFloat($('#enemy').css('height')),
     type: 'paddle',
   }
   var player = {
     id: "#player",
-    x: undefined,
-    y: undefined,
+    x: 0,
+    y: 0,
     speedX: 0,
     speedY: 0,
+    points: 0,
     width: parseFloat($('#player').css('width')),
     height: parseFloat($('#player').css('height')),
     type: 'paddle',
   }
   var ball = {
     id: "#ball",
-    x: undefined,
-    y: undefined,
+    x: 0,
+    y: 0,
     speedX: 0,
     speedY: 0,
     width: parseFloat($('#ball').css('width')),
@@ -67,11 +72,12 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    handlePlayer();
     handleBall();
+    handlePlayer();
     handleEnemy();
-    handleCollisions(player, ball);
-    handleCollisions(enemy, ball);
+    handleCollisions(ball, board);
+    handleCollisions(ball, player);
+    handleCollisions(ball, enemy);
     updateScreen();
   }
 
@@ -96,19 +102,25 @@ function runProgram(){
   ////////////////////////////////////////////////////////////////////////////////
   //FINISH THIS TMMRW MORNING, JUST ADD THE 
   function spawn () {
-    enemy.x = 25; 
+    enemy.x = board.x + enemy.width; 
     enemy.y = 220;
-    player.x = 415;
+    enemy.speedX = 0;
+    enemy.speedY = 0;
+    player.x = board.width - player.width;
     player.y = 220;
-    ball.x = boardWidth / 2 + ball.width / 2;
-    ball.y = boardHeight / 2 + ball.height / 2;
-    ball.speedX = 1;
-    ball.speedY = 1;
+    player.speedX = 0;
+    player.speedY = 0;
+    ball.x = boardWidth / 2 - ball.width / 2;
+    ball.y = boardHeight / 2 - ball.height / 2;
+    bounceBall(posneg);
     changePosition(ball);
     changePosition(player);
     changePosition(enemy);
+    updateScreen();
+    $("#playerpoints").text('Player Points: ' + player.points);
+    $("#enemypoints").text('Enemy Points: ' + enemy.points);
     }
-  function handlePlayer() {
+    function handlePlayer() {
     if (keysHeld.includes("up")) {
       player.speedY = -10
     }
@@ -126,22 +138,72 @@ function runProgram(){
     changePosition(enemy);
   }
   function handleBall() {
-    bounceBall ();
+    /*let ballSpeedTotal = Math.abs(ball.speedX) + Math.abs(ball.speedY);
+    if (ballSpeedTotal < 4 && ballSpeedTotal > -4) {
+            console.log("stuck");
+      ball.speedY = Math.round((Math.random() * 8) - 4) * -1;
+      ball.speedX = Math.round((Math.random() * 8) - 4) * -1;
+    }
+    else {
+      //console.log ("unstuck");
+    }*/
     changePosition(ball);
   };
   function handleCollisions (obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
-    if (obj1.sides.left < obj2.sides.right && obj1.sides.right < obj2.sides.left || obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
-      if (obj2.id === "#ball") {
-        bounceBall();
+    if (obj2.id === "#player") {
+      if (obj1.sides.right > obj2.sides.left) {
+        if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
+          console.log("collided with player");
+          bounceBall();
+          
       }
     }
-    changePosition(ball)
-  };
+  }
+    if (obj2.id === "#enemy") {
+    if (obj1.sides.left < obj2.sides.right) {
+      if (obj1.sides.bottom > obj2.sides.top && obj1.sides.top < obj2.sides.bottom) {
+        console.log("collided with enemy");
+        bounceBall();
+        
+    }
+  }
+}
+    if (obj2.id === "#board") {
+    if (obj1.sides.bottom > obj2.sides.bottom || obj1.sides.top < obj2.sides.top) {
+      console.log("collided with roof/floor");
+      obj1.speedY = obj1.speedY * -1;
+    }
+    if (obj1.sides.left < obj2.sides.left) {
+      player.points += 1;
+      console.log("player scored");
+      resetScene();
+    }
+    else if (obj1.sides.right > obj2.sides.right) {
+      enemy.points += 1;
+      console.log("enemy scored");
+      resetScene();
+    }
+  }
+};
   function bounceBall () {
-    ball.speedX = ball.speedX /* * Math.max(-3, Math.round(Math.random() * 2) */ * -1;
-    ball.speedY = ball.speedY /* * Math.max(-3, Math.round(Math.random() * 2) */ * -1;
+    var i = findPosNeg();
+    ball.speedY = Math.round((Math.random() * 3) + 2) * (-1 * i);
+    ball.speedX = Math.round((Math.random() * 3) + 2) * (-1 * i);
+    console.log("bouncy bouncy");
+    if (ball.speedX > 4) {
+      ball.speedX = 4;
+    }
+    else if (ball.speedX < -4) {
+      ball.speedX = -4;
+    };
+    if (ball.speedY > 4) {
+      ball.speedY = 4;
+    }
+    else if (ball.speedY < -4) {
+      ball.speedY = -4;
+    };
   }
   function changePosition(object) {
     object.y += object.speedY;
@@ -152,20 +214,33 @@ function runProgram(){
   }
   function updateScreen() {
     //i know changing the x is not used by the paddles, but is good to have for the ball
-    moveObject(player.id, player.x, player.y);
-    moveObject(enemy.id, enemy.x, enemy.y);
-    moveObject(ball.id, ball.x, ball.y);
+    //disregard prev comment, removed the x and y parameters in moveObject
+    moveObject(player);
+    moveObject(enemy);
+    moveObject(ball);
   }
-  function moveObject (object, x, y) {
-    $(object).css("left", x);
-    $(object).css("top", y);
+  function resetScene () {
+    spawn();
+
+  }
+  function findPosNeg () {
+      if (ball.speedX > 0) {
+        return 1;
+      }
+      else {
+        return -1;
+      }
+    };
+  function moveObject (object) {
+    $(object.id).css("left", object.x);
+    $(object.id).css("top", object.y);
   };
   function findSides (object) {
     object.sides = {
       right: object.x + object.width,
       left: object.x,
       top: object.y,
-      bottom: object.x + object.height,
+      bottom: object.y + object.height,
     }
   };
   function endGame() {
