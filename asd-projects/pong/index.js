@@ -62,7 +62,7 @@ function runProgram(){
   $(document).on('keydown', handleKeyDown);                           // change 'eventType' to the type of event you want to handle 
   $(document).on('keyup', handleKeyUp); 
   //spawn positioning
-  spawn();
+  resetScene();
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ function runProgram(){
   
   //called at the start of the game and after a point is scored
   function spawn () {
-    enemy.x = board.x + enemy.width; 
+    enemy.x = board.x; 
     enemy.y = 220;
     enemy.speedX = 0;
     enemy.speedY = 0;
@@ -114,7 +114,8 @@ function runProgram(){
     player.speedY = 0;
     ball.x = boardWidth / 2 - ball.width / 2;
     ball.y = boardHeight / 2 - ball.height / 2;
-    bounceBall(posneg);
+    ball.speedX = 1;
+    bounceBall();
     changePosition(ball);
     changePosition(player);
     changePosition(enemy);
@@ -156,12 +157,19 @@ function runProgram(){
   };
 //called after every round to check if there is a winner
   function finishGame () {
-    if (player.points === 11) {
+    if (player.points >= 11) {
       console.log('PLAYER WINS');
+      player.points = 0;
+      enemy.points = 0;
+      spawn();
     }
-    else if (enemy.points === 11) {
+    else if (enemy.points >= 11) {
       console.log("ENEMY WINS")
+      player.points = 0;
+      enemy.points = 0;
+      spawn();
     }
+    //reset game completely
   }
 //handles the meat of this program, uses the sides of both objects to see whether or not it has collided
   function handleCollisions (obj1, obj2) {
@@ -201,14 +209,18 @@ function runProgram(){
       console.log("enemy scored");
       resetScene();
     }
+//this just fixes the scene if the ball gets stuck underneath the board
+    if (obj1.sides.bottom > obj2.sides.bottom + 10) {
+      resetScene();
+    }
   }
-};
+  }
 //bounce the ball a random amount, uses posneg to find if the ball is travelling left or right to make sure it travels opposite on bounce
   function bounceBall () {
     var i = findPosNeg();
-    ball.speedX = Math.round((Math.random() * 5) + 4) * (-1 * i);
+    ball.speedX = Math.round((Math.random() * 3) + 3) * (-1 * i);
     ball.speedY = 10 - ball.speedX * (-1 * i);
-    console.log("bouncy bouncy");
+    //console.log("bouncy bouncy");
     if (ball.speedX > 8) {
       ball.speedX = 8;
     }
@@ -223,12 +235,25 @@ function runProgram(){
     };
   }
   function changePosition(object) {
+    if (object.id === "#player") {
+      if (player.y > board.height - player.height) {
+        player.y = board.height - player.height;
+      }
+      else if (player.y < board.y) {
+        player.y = board.y;
+      }
+    else if (object.id === "#enemy") {
+      if (enemy.y > board.height - enemy.height) {
+        enemy.y = board.height - enemy.height;
+      }
+      else if (enemy.y < enemy.y) {
+        enemy.y = board.y;
+      }
+    }
+  }
     object.y += object.speedY;
     object.x += object.speedX;
-    if (object.type === "paddle") {
-      
-    };
-  }
+}
   function updateScreen() {
     /*i know changing the x is not used by the paddles, but is good to have for the ball
     disregard prev comment, removed the x and y parameters in moveObject*/
@@ -239,19 +264,19 @@ function runProgram(){
     moveObject(ball);
   }
   function resetScene () {
-    //called when a point is given, calls the spawn function to reposition and reset the ball, enemy, and player
+    //called when a point is given or ball is unplayable, calls the spawn function to reposition and reset the ball, enemy, and player
     spawn();
-
   }
   function findPosNeg () {
-    //finds if travelling left or right and returns 1 or -1 to tell which direction to bounce in
-      if (ball.speedX > 0) {
+    //finds if travelling left or right and returns 1 or -1 to tell which direction to bounce in 
+    if (ball.speedX > 0) {
         return 1;
       }
       else {
         return -1;
       }
     };
+
   function moveObject (object) {
     //use jquery to reposition the selected object on screen
     $(object.id).css("left", object.x);
@@ -265,7 +290,8 @@ function runProgram(){
       top: object.y,
       bottom: object.y + object.height,
     }
-  };
+  }
+
   function endGame() {
     // stop the interval timer
     clearInterval(interval);
