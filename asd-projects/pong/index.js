@@ -75,9 +75,6 @@ function runProgram(){
     handleBall();
     handlePlayer();
     handleEnemy();
-    handleCollisions(ball, board);
-    handleCollisions(ball, player);
-    handleCollisions(ball, enemy);
     updateScreen();
   }
 
@@ -153,6 +150,9 @@ function runProgram(){
   }
 //handles the balls movement
   function handleBall() {
+    handleCollisions(ball, player);
+    handleCollisions(ball, enemy);
+    handleCollisions(ball, board);
     changePosition(ball);
   };
 //called after every round to check if there is a winner

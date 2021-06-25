@@ -2,11 +2,10 @@
 // as soon as the page loads and is where you should call your functions.
 $(document).ready(function(){
     const $display = $('#display');
-
     // TODO: Call your apply function(s) here
-    applyFilter(reddify);
-    applyFilter(decreaseBlue);
-    applyFilter(increaseGreenbyBlue);
+    applyFilterNoBackground(reddify);
+    applyFilterNoBackground(decreaseBlue);
+    //applyFilterNoBackground(increaseGreenbyBlue);
 
 
     render($display, image);
@@ -15,7 +14,6 @@ $(document).ready(function(){
 /////////////////////////////////////////////////////////
 // "apply" and "filter" functions should go below here //
 /////////////////////////////////////////////////////////
-
 // TODO 1 & 3: Create the applyFilter function here
 function applyFilter(filterFunction) {
     for (var i = 0; i <= image.length - 1; i++) {
@@ -33,12 +31,17 @@ function applyFilter(filterFunction) {
             };
 // TODO 5: Create the applyFilterNoBackground function
 function applyFilterNoBackground(filterFunction) {
-    for (var i = 0; i <= image.length - 1; i++) {
-        for (var j = 0; j <= image[i].length - 1; j++) {
+    var backgroundColor = image;
+    for (var i = 0; i < image.length - 1; i++) {
+        for (var j = 0; j < image[i].length - 1; j++) {
             var rgbString = image[i][j];
             var rgbNumbers = rgbStringToArray(rgbString);
-            if (image[i][j][RED] === 150 || image[i][j][BLUE] === 150 || image[i][j][GREEN] === 150) {
+            //console.log(backgroundColor);
+            if (rgbNumbers[RED] !== backgroundColor || rgbNumbers[BLUE] !== backgroundColor || rgbNumbers[GREEN] !== backgroundColor) {
                 filterFunction(rgbNumbers);
+            }
+            else {
+                //filterFunction(rgbNumbers);
             }
             //
             
