@@ -1,4 +1,14 @@
 Gameplay: Move a paddle up and down to compete against an opponent to score points
-Start Coditions: 0 points
-End Condition: ball collides with either the right or left side of the screen. Point given. 5 points for either side ends game and resets.
-If Conditions: if Colliding
+Start Conditions: 0 points
+End Condition: ball collides with either the right or left side of the screen. Point given. 11 points for either side ends the game and resets the scene for another play.
+If Conditions: Collisions with sides and paddles with the ball.
+Static elements: board
+Animated elements: ball, player paddle, enemy paddle, scoreboard.
+Data tracked: speedX/speedY, xPos/Ypos, points(player and enemy), sides of elements.
+Events: 
+    -Keyboard: keyDown keyUp
+    -Timing: 60 times a second refresh positions in memory and on screen. {
+        -refresh memory
+        -check collisions with ball
+        -refresh screen positions
+    }
