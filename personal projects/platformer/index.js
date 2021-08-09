@@ -93,6 +93,12 @@ function runProgram(){
       keysHeld.splice(keysHeld.indexOf(key), 1);
         }
   };
+  /*function updateKeys() {
+    for (i = 0; i++; i <= keysHeld.length) {
+      //if keys pressed are also a valid key for movement, update
+    }
+
+  }*/
 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
@@ -203,9 +209,6 @@ function runProgram(){
   function changePosition(object) {
     object.position.y += object.speed.y;
     object.position.x += object.speed.x;
-    if (object.type === "player") {
-      //console.log(object.position);
-    }
 }
   function updateScreen() {
     moveObject(player);

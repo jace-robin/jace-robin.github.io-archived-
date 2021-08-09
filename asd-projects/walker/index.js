@@ -26,7 +26,7 @@ function runProgram(){
       allowMove: true,
     }
     };
-    var coords = {
+/*    var coords = {
       delta : {
       x: 0,
       y: 0,
@@ -35,7 +35,8 @@ function runProgram(){
       x: 0,
       y: 0,
       }
-    };
+    };*/
+
   // one-time setup
   
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
@@ -53,8 +54,6 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-   //reduceSpeed(rateOfDecrease);
-   //collision()
    updateData();
    logPosition();
   }
@@ -143,6 +142,7 @@ function runProgram(){
     else if (keysHeld.includes("right") === true) {
       player1.speed.x += 3;
         }
+      }
   if (Math.abs(player1.speed.y) < 10) {
     if (keysHeld.includes("up") === true) {
       player1.speed.y += 3;
@@ -151,7 +151,6 @@ function runProgram(){
       player1.speed.y -= 3;
       }
     }
-}
 //  else {
 //    console.log("nah lmao");
 //}
