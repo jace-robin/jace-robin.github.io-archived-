@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <style> 
+        
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="calculator.js"></script>
+    </head>
+    <body>
+        <div id="topbar">
+            <center>
+                <h1>Time Card Calculator</h1>
+            </center>
+        </div>
+        <div id="pageInfo">
+            <center>
+            <h3>Instructions</h3>
+            <p>This is a small program made in just about 6 hours because im too lazy to do actual work in Financial Literacy,</p>
+            <p>so expect that level of quality. All boxes must be filled for the program to work</p>
+            <p>In 1 and Out 1 are for the first half of the day, before lunch break, and Vice Versa for 2</p>
+            <p>The times must be in military time for it to work, just add 12 to the hour and it should work</p>
+            <p>The format is HHMM (hour/minute)</p>
+            <p>For example, clock in at 7:45 would by typed as "745"(except no quotations)</p>
+            </center>
+        </div>
+        <center>
+        <div>
+            <div>
+                <input type="number" id="in1">
+                <button type="button" id="BtnIn1">Set Time In 1</button>
+            </div>
+            <div>
+                <input type="number" id="out1">
+                <button type="button" id="BtnOut1">Set Time Out 1</button>
+            </div>
+            <div>
+                <input type="number" id="in2">
+                <button type="button" id="BtnIn2">Set Time In 2</button>
+            </div>
+            <div>
+                <input type="number" id="out2">
+                <button type="button" id="BtnOut2">Set Time Out 2</button>
+            </div>
+            <div>
+                <input type="number" id="normalRate">
+                <button type="button" id="BtnNormalRate">Set Normal Rate</button>
+            </div>
+            <div>
+                <input type="number" id="overtimeLimit">
+                <button type="button" id="BtnOvertimeLimit">Set Hours Before Overtime</button>
+            </div>
+            <div>
+                <input type="number" id="overtimeRate">
+                <button type="button" id="BtnOvertimeRate">Set Overtime Rate</button>
+            </div>
+        </div>
+        <div>
+            <button type="button" id="BtnCalc">Calculate</button>
+        </div></center>
+        <center>
+            <p id="totalHours">Hours</p>
+            <p id="totalPay">Pay</p>
+        </center>
+    </body>
+</html>
