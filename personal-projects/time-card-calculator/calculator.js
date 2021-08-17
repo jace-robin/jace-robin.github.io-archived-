@@ -1,35 +1,14 @@
 $(document).ready(runProgram);
 var in1, in2, out1, out2,payRate, overtimeLimit, overtimeRate;
 function runProgram() {
-    $("#BtnIn1").click(function(){
-        in1 = $("#in1").val();
-        alert(in1);
-    });
-    $("#BtnOut1").click(function(){
-        out1 = $("#out1").val();
-        alert(out1);
-    });
-    $("#BtnIn2").click(function(){
-        in2 = $("#in2").val();
-        alert(in2);
-    });
-    $("#BtnOut2").click(function(){
-        out2 = $("#out2").val();
-        alert(out2);
-    });
-    $("#BtnNormalRate").click(function(){
-        payRate = $("#normalRate").val();
-        alert(payRate);
-    });
-    $("#BtnOvertimeLimit").click(function(){
-        overtimeLimit = $("#overtimeLimit").val();
-        alert(overtimeLimit);
-    });
-    $("#BtnOvertimeRate").click(function(){
-        overtimeRate = $("#overtimeRate").val();
-        alert(overtimeRate);
-    });
     $("#BtnCalc").click(function(){
+        {in1 = $("#in1").val();
+        in2 = $("#in2").val();
+        out1 = $("#out1").val();
+        out2 = $("#out2").val();
+        payRate = $("#normalRate").val();
+        overtimeLimit = $("#overtimeLimit").val();
+        overtimeRate = $("#overtimeRate").val();}
         calculateTotal();
     });
 }
