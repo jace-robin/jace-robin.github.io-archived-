@@ -57,8 +57,9 @@ function runProgram(){
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
   $(document).on('keydown', handleKeyDown);
   $(document).on('keyup', handleKeyUp);
-  $(document).on('mousedown', handleMouseDown);
-  $(document).on('mouseup', handleMouseUp); 
+  $(document).on('click', handleMouseDown);
+  //$(document).on('mouseup', handleMouseUp); 
+  
   //spawn positioning
   spawn();
   ////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +71,9 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
+    findMousePosition();
     handlePlayer();
+    changePosition(player);
     updateScreen();
     //console.log (player);
   }
@@ -78,7 +81,7 @@ function runProgram(){
   /* 
   Called in response to events.
   */
-  
+
   function handleKeyDown(event) {
     var key = keycodes[event.which - 1];
     if (!keysHeld.includes(key)) {
@@ -93,7 +96,8 @@ function runProgram(){
         }
   };
   function handleMouseDown(event) {
-    
+    addVelocity("x", Math.abs(mouse.position.x - player.position.x));
+    addVelocity("y", Math.abs(mouse.position.y - player.position.y));
   };
   function handleMouseUp() {
     if (mouse.held) {
@@ -101,9 +105,8 @@ function runProgram(){
     }
   };
   function findMousePosition() {
-    mouse.position.x = client.x;
-    mouse.position.y = client.y;
-    alert(mouse.position);
+    mouse.position.x = client.pageX;
+    mouse.position.y = client.pageY;
   };
   /*function updateKeys() {
     for (i = 0; i++; i <= keysHeld.length) {
@@ -119,7 +122,6 @@ function runProgram(){
   
   //called at the start of the game
   function spawn () {
-    alert("ye");
     player.position.x = board.x + player.width;
     player.position.y = board.height - player.height;
     player.speed.x = 0;
@@ -200,7 +202,9 @@ function runProgram(){
     }
   }
   };
-
+  function addVelocity (xy, speed) {
+    player.speed[xy] = speed;
+  }
 
   /*function create(id, type, x, y, speedx, speedy, width, height) {
     var object = {
@@ -222,7 +226,7 @@ function runProgram(){
   function changePosition(object) {
     object.position.y += object.speed.y;
     object.position.x += object.speed.x;
-}
+  }
   function updateScreen() {
     moveObject(player);
   }
