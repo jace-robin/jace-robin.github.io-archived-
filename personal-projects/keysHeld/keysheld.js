@@ -8,18 +8,21 @@ $(document).on("keyup", handleKeyUp);
 //////////////////
     var c = {
         //change methods
-        t: function (id, desired) {
+        text: function (id, desired) {
             //change the text of id
-            $(h.id(id)).text(h.q(desired));
+            $(id).text(desired);
         },
-        c: function (id, color) {
+        color: function (id, color) {
             //change color of id to color input
-            $(h.id(id)).css("color", h.q(color));
+            $(id).css("color", color);
         },
+        x: function (id, x) {
+            $(h.id(id)).css("x", h.quote(x));
+        }
     };
     var h = {
         //helper methods
-        q: function (text) {
+        quote: function (text) {
             //add quotations to input
             return ('"' + text + '"');
         },
@@ -34,25 +37,40 @@ $(document).on("keyup", handleKeyUp);
             //held keys
         },
     };
-    ///////////////
-    //Update Text//
-    ///////////////
+////////////////////
+//Var Declarations//
+////////////////////
+var held = []
+///////////////
+//Update Text//
+///////////////
     function getKeys() {
         for (var i = 0; i >= Object.keys(keyStatus).length; i++) {
-            if (keyStatus[keyObject.i] === true) {
-                
+            var ii
+            keysHeld[i]=keyStatus[keyObject[i]];
+            if (keyStatus[keyObject[i]]) {
+
             }
-        }
+        };
     };
 
     function handleKeyDown(event) {
         var key = ('"' + keyObject[event.which] + '"');
         keyStatus[key] = true;
-        console.log(key);
+        if (!held.contains(key)) {
+            held.push(key);
+        }
+        alert("test");
       };
     function handleKeyUp(event) {
         var key = ('"' + keyObject[event.which] + '"');
         keyStatus[key] = false;
+        if (held.contains(key)) {
+            held.splice(held.indexOf(key), 1);
+        }
         console.log(key);
       };
+////////////////
+//Program Loop//
+////////////////
 };
