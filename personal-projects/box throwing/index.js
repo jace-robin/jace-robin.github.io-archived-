@@ -57,9 +57,9 @@ function runProgram(){
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
   $(document).on('keydown', handleKeyDown);
   $(document).on('keyup', handleKeyUp);
-  $(document).on('click', handleMouseDown);
-  //$(document).on('mouseup', handleMouseUp); 
-  
+  $(document).on('mousedown', handleMouseDown);
+  $(document).on('mouseup', handleMouseUp); 
+  $(document).on('mousemove', handleMouseMove); 
   //spawn positioning
   spawn();
   ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,6 @@ function runProgram(){
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    findMousePosition();
     handlePlayer();
     changePosition(player);
     updateScreen();
@@ -81,13 +80,19 @@ function runProgram(){
   /* 
   Called in response to events.
   */
-
+  function handleMouseMove(event) {
+    findMousePosition();
+    $("#mouseX").text("'" + mouse.position.x + "'");
+    $("#mouseY").text("'" + mouse.position.y + "'");
+    player.position.x = mouse.position.x;
+    player.position.y = mouse.position.y;
+  }
   function handleKeyDown(event) {
     var key = keycodes[event.which - 1];
     if (!keysHeld.includes(key)) {
       keysHeld.push(key);
     }
-
+    alert("x: " + mouse.position.x + ", y: " + mouse.position.y);
   };
   function handleKeyUp(event) {
     var key = keycodes[event.which - 1];
@@ -98,11 +103,10 @@ function runProgram(){
   function handleMouseDown(event) {
     addVelocity("x", Math.abs(mouse.position.x - player.position.x));
     addVelocity("y", Math.abs(mouse.position.y - player.position.y));
+    $("#board").css("background-color", "blue");
   };
   function handleMouseUp() {
-    if (mouse.held) {
-      mouse.held = false;
-    }
+    $("#board").css("background-color", "red");
   };
   function findMousePosition() {
     mouse.position.x = client.pageX;
@@ -122,7 +126,7 @@ function runProgram(){
   
   //called at the start of the game
   function spawn () {
-    player.position.x = board.x + player.width;
+    player.position.x = board.position.x + player.width;
     player.position.y = board.height - player.height;
     player.speed.x = 0;
     player.speed.y = 0;
@@ -140,15 +144,15 @@ function runProgram(){
     }
     else {
       handleDrag(player, 'x');
-    }
+    };
     if (keysHeld.includes("up")) {
       if (allowJump && player.jumps > 0) {
         console.log(player.jumps);
         player.speed.y = -10;
         player.jumps -= 1;
         console.log(player.jumps);
-    }        
-  }
+      }        
+    };
     if (handleCollisions(floor, player) === true) {
       if (allowJump) {
         if (player.jumps <= 2) {
@@ -159,16 +163,21 @@ function runProgram(){
         }
         allowJump = false;
       }
-    }
+    };
     if (handleCollisions(floor, player) === false) {
       allowJump = false;
       player.speed.y += 3;
+    }
+    else if (handleCollisions(floor, player) && (player.speed.y > 0)) {
+      player.speed.y = 0;
+      wait(.1);
+      player.position.y -= 5;
     }
     console.log ("allowJump " + allowJump);
     if (player.speed.x || player.speed.y) {
       console.log("speed x: " + player.speed.x + ", speed y: " + player.speed.y);
       //console.log("position x: " + player.position.x + ", position y: " + player.position.y);
-    }
+    };
     if (!player.position.x) {
       player.position.x = 0;
     }
