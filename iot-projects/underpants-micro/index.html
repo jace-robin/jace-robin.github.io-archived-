@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Underpants-Micro Library</title>
+        <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.19.0.css">
+        <script src="https://code.jquery.com/qunit/qunit-1.19.0.js"></script>
+        <meta name="description" content="Underpants: functional functions for fun">
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <script src="underpants.js"></script>
+        <script>
+/* global _ */
+QUnit.test("_.identity()", function(assert) {
+    assert.strictEqual( _.identity(14), 14, "Should handle numbers.");
+    assert.deepEqual( _.identity({a: "one"}), {a: "one"}, "Should handle objects.");
+    assert.strictEqual(_.identity("hello there"), "hello there", "Should handle strings.");
+    assert.deepEqual(_.identity([1,2,3]), [1,2,3], "Should handle arrays.");
+});
+
+QUnit.test("_.indexOf()", function(assert){
+    var inputData = ["a","b","c","d"];
+    assert.deepEqual(_.indexOf(inputData, "b") , 1, "Should return the correct index when an element is found.");
+    assert.deepEqual(_.indexOf(inputData.concat("b"), "b") , 1, "Should return the index of the first occurance of a found element.");
+    assert.deepEqual(_.indexOf(inputData, "e") , -1, "Should return -1 if the element is not found.");
+    assert.deepEqual(inputData, ["a","b","c","d"], "Should not have side effects.");
+});
+
+QUnit.test("_.contains()", function(assert){
+    var inputData = [1,"3",4,5,"a","4","b"];
+    assert.strictEqual(_.contains(inputData, "a") , true, "Should return true if a list contains an element.");
+    assert.strictEqual(_.contains(inputData, "c") , false, "Should return false if a list doesn't contain an element.");
+    assert.strictEqual(_.contains(inputData, 3) , false, "Should not convert types when checking.");
+    assert.deepEqual(inputData, [1,"3",4,5,"a","4","b"], "Should not have side effects.");
+});
+
+QUnit.test("_.each()", function(assert){
+    var inputArray = [1,2,3,4,5];
+    inputArray.ignoreMe = "this shouldn't show up";
+
+    _.each(inputArray, function(e, i, a){
+        inputArray[i] = e*a.length;
+    });
+    assert.deepEqual(inputArray ,[5,10,15,20,25] , "Should handle arrays.");
+});
+
+QUnit.test("_.filter()", function(assert){
+    var inputData = ["a",1,"b",2,"c",4];
+    assert.deepEqual(_.filter(inputData, function(e,i,a){
+        return typeof e === "string" && i < a.length/2;
+    }), ["a","b"], "Should filter elements in an array.");
+    assert.deepEqual(inputData, ["a",1,"b",2,"c",4], "Should not have side effects.");
+});
+
+QUnit.test("_.reject()", function(assert){
+    var inputData = ["a",1,"b",2,"c",4];
+    assert.deepEqual(_.reject(inputData, function(e,i,a){
+        return typeof e === "string" || i < a.length/2;
+    }), [2,4], "Should reject elements in an array.");
+    assert.deepEqual(inputData, ["a",1,"b",2,"c",4], "Should not have side effects.");
+});
+
+QUnit.test("_.map", function(assert){
+    var inputArray = ["a","b","c","d"];
+    var inputObject = {"a":1, "b":2, "c":3, "d":4};
+    assert.deepEqual(_.map(inputArray, function(e,i,a){
+        return e + i * a.length;
+    }), ["a0", "b4", "c8", "d12"], "Should map through arrays.");
+    
+    assert.deepEqual(inputArray,["a","b","c","d"],"Should not have side effects.");
+});
+
+        </script>
+    </body>
+</html>
