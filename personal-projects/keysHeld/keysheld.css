@@ -1,6 +1,8 @@
-body {background: linear-gradient(110deg, #c311d2, #762fc3, #4934ae);
-    background-size: 600% 600%;
-    animation: 7s ease infinite;
+             body{/*background: linear-gradient(110deg, #c311d2, #762fc3, #4934ae);
+                background-size: 600% 600%;
+                animation: 7s ease infinite;
+                */
+                background-color: black;
                 padding: 10px;
                 font-family: arial;
             }
@@ -15,12 +17,13 @@ body {background: linear-gradient(110deg, #c311d2, #762fc3, #4934ae);
     
             /* navigation menu */
             nav {
-                background: rgb(130, 69, 181);
+                /*background: rgb(130, 69, 181);*/
                 margin: 0 auto;
                 margin-bottom: 20px;
                 display: flex;
                 padding: 10px;
                 border-radius: 30px; 
+                border-color: black;
             }
             nav header {
                 display: flex;
@@ -38,7 +41,7 @@ body {background: linear-gradient(110deg, #c311d2, #762fc3, #4934ae);
             nav a {
                 text-decoration: none;
                 color: #fff;
-            }2
+            }
             /* main container area beneath menu */
             main {
                 background: rgb(245, 238, 219);
@@ -50,4 +53,8 @@ body {background: linear-gradient(110deg, #c311d2, #762fc3, #4934ae);
             }
             .interests header {
                 font-size: 1.25em;
+            }
+            #keys {
+                text-decoration-color: teal;
+                flex: 1;
             }
