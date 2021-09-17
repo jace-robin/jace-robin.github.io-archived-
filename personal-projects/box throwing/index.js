@@ -111,7 +111,7 @@ function runProgram(){
     mouse.held = true;
     $("#mouseHeld").text("held");
     //throw player
-    yeet(player, 10);
+    yeet(player, 2);
   };
   function handleMouseUp() {
     mouse.held = false;
@@ -205,8 +205,8 @@ function updateText() {
     return distance;
   }
   function yeet(object, power) {
-    setVelocityX(object, (mouse.position.x - object.middle.x)/power) * findPosNeg(player);
-    setVelocityY(object, (mouse.position.y - object.middle.y)/power) * findPosNeg(player);
+    setVelocityX(object, ((mouse.position.x - object.middle.x)/10)*power) * findPosNeg(player);
+    setVelocityY(object, ((mouse.position.y - object.middle.y)/10)*power) * findPosNeg(player);
   };
   function setVelocityX (object, speed) {
     object.speed.x = speed;
