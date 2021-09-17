@@ -16,13 +16,13 @@ function runProgram(){
       x: 0,
       y: 0,
     },
-    held: false
+    held: NaN,
   }
   var board = {
     id: "#board",
     position: {
-      x: 0,
-      y: 0,        
+      x: $("#board").css("x"),
+      y: $("#board").css("y"),        
       },
     width: parseFloat($('#board').css('width')),
     height: parseFloat($('#board').css('height')),
@@ -42,6 +42,10 @@ function runProgram(){
   var player = {
     id: "#player",
     position: {
+      x: 0,
+      y: 0,
+    },
+    middle: {
       x: 0,
       y: 0,
     },
@@ -72,7 +76,7 @@ function runProgram(){
   */
   function newFrame() {
     handlePlayer();
-    changePosition(player);
+    updateText();
     updateScreen();
     //console.log (player);
   }
@@ -81,18 +85,17 @@ function runProgram(){
   Called in response to events.
   */
   function handleMouseMove(event) {
-    findMousePosition();
+    //find mouse position
+    mouse.position.x = event.pageX;
+    mouse.position.y = event.pageY;
     $("#mouseX").text("'" + mouse.position.x + "'");
     $("#mouseY").text("'" + mouse.position.y + "'");
-    player.position.x = mouse.position.x;
-    player.position.y = mouse.position.y;
   }
   function handleKeyDown(event) {
     var key = keycodes[event.which - 1];
     if (!keysHeld.includes(key)) {
       keysHeld.push(key);
     }
-    alert("x: " + mouse.position.x + ", y: " + mouse.position.y);
   };
   function handleKeyUp(event) {
     var key = keycodes[event.which - 1];
@@ -101,16 +104,14 @@ function runProgram(){
         }
   };
   function handleMouseDown(event) {
-    addVelocity("x", Math.abs(mouse.position.x - player.position.x));
-    addVelocity("y", Math.abs(mouse.position.y - player.position.y));
-    $("#board").css("background-color", "blue");
+    mouse.held = true;
+    $("#mouseHeld").text("held");
+    //throw player
+    yeet(player);
   };
   function handleMouseUp() {
-    $("#board").css("background-color", "red");
-  };
-  function findMousePosition() {
-    mouse.position.x = client.pageX;
-    mouse.position.y = client.pageY;
+    mouse.held = false;
+    $("#mouseHeld").text("not held");
   };
   /*function updateKeys() {
     for (i = 0; i++; i <= keysHeld.length) {
@@ -123,6 +124,17 @@ function runProgram(){
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   
+//update text for debugging
+function updateText() {
+  //mouse info
+  $("#mouseX").text("mouse x: " + mouse.position.x);
+  $("#mouseY").text("mouse y: " + mouse.position.y);
+  //player info
+  $("#playerX").text("player x: " + player.position.x);
+  $("#playerY").text("player y: " + player.position.y);
+  $("#speedX").text("speed x: " + player.speed.x);
+  $("#speedY").text("speed y: " + player.speed.y);
+}
   
   //called at the start of the game
   function spawn () {
@@ -132,89 +144,68 @@ function runProgram(){
     player.speed.y = 0;
     }
 //handles player movement and key presses
-    function handlePlayer() {
-    capSpeed(player, 'y');
-      if (keysHeld.includes("left")) {
-      player.speed.x -= 5;
-      capSpeed(player, 'x');
-    }
-    else if (keysHeld.includes("right")) {
-      player.speed.x += 5;
-      capSpeed(player, 'x');
-    }
-    else {
-      handleDrag(player, 'x');
-    };
-    if (keysHeld.includes("up")) {
-      if (allowJump && player.jumps > 0) {
-        console.log(player.jumps);
-        player.speed.y = -10;
-        player.jumps -= 1;
-        console.log(player.jumps);
-      }        
-    };
-    if (handleCollisions(floor, player) === true) {
-      if (allowJump) {
-        if (player.jumps <= 2) {
-          player.jumps = 2;
-        }
-        if (player.speed.y > 0) {
-          player.speed.y += player.speed.y * -1;
-        }
-        allowJump = false;
+  function handlePlayer() {
+    handleGravity();
+    /*if (handleCollisions(player, floor) === true) {
+      if (player.speed.y > 0) {
+        player.speed.y += player.speed.y * -1;
       }
     };
-    if (handleCollisions(floor, player) === false) {
+    if (handleCollisions(player, floor) === false) {
       allowJump = false;
       player.speed.y += 3;
     }
-    else if (handleCollisions(floor, player) && (player.speed.y > 0)) {
+    else if (handleCollisions(player, floor) && (player.speed.y > 0)) {
       player.speed.y = 0;
       wait(.1);
       player.position.y -= 5;
     }
-    console.log ("allowJump " + allowJump);
-    if (player.speed.x || player.speed.y) {
-      console.log("speed x: " + player.speed.x + ", speed y: " + player.speed.y);
-      //console.log("position x: " + player.position.x + ", position y: " + player.position.y);
-    };
     if (!player.position.x) {
       player.position.x = 0;
     }
     if (!player.position.y) {
       player.position.y = 0;
-    }
-    changePosition(player);
+    }*/
   };
 //handles the meat of this program, uses the sides of both objects to see whether or not it has collided
   function handleCollisions (obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
 //if colliding with player
-    if (obj2.type === "player") {
-        if (obj1.sides.top < obj2.sides.bottom) {
-          console.log("collided with " + obj1.type);
-          allowJump = true;
-          return true;
-      }
-      else {
-        allowJump = false;
-        return false;
-      }
+
+  if (obj1.position.x < obj2.position.x + obj2.width &&
+    obj1.position.x + obj1.width > obj2.position.x &&
+    obj1.position.y < obj2.position.y + obj2.height &&
+    obj1.position.y + obj1.height > obj2.position.y) {
+     // collision detected!
+     return true;
   }
-//if colliding with board, check if either roof||floor (another leftover, maybe useful?)
+
+/*if (obj2.type === "player") {
+      if (obj1.sides.top < obj2.sides.bottom) {
+        console.log("collided with " + obj1.type);
+        return true;
+      }
+    }
+//if colliding with board, check if either roof||floor (another leftover, maybe useful?) (2. i think i removed it sometime after, n)
     
     if (obj1.type === "floor") {
     if (obj1.sides.top < obj2.sides.bottom) {
       //console.log("player collided with floor");
       //obj2.position.y = board.y - player.height - floor.height;
     }
-  }
+  }*/
   };
-  function addVelocity (xy, speed) {
-    player.speed[xy] = speed;
-  }
-
+  function yeet(object) {
+    setVelocityX(object, ((Math.abs(mouse.position.x - object.middle.x) * findPosNeg(object))/1000));
+    setVelocityY(object, Math.abs(mouse.position.y - object.middle.y)/1000);
+  };
+  function setVelocity (object, speed) {
+    object.speed.x = speed;
+  };
+  function setVelocityY (object, speed) {
+    object.speed.y = speed;
+  };
   /*function create(id, type, x, y, speedx, speedy, width, height) {
     var object = {
       id: id,
@@ -231,23 +222,25 @@ function runProgram(){
     return object;
   }*/
 
+  function handleGravity() {
 
-  function changePosition(object) {
+  };
+  function setPosition(object) {
     object.position.y += object.speed.y;
     object.position.x += object.speed.x;
   }
   function updateScreen() {
-    moveObject(player);
+    setPosition(player);
+    updatePosition(player);
   }
-  function findPosNeg (object) {
-    //finds if an object is travelling left or right and returns 1 or -1
-    return (object.speed.x > 0? 1: -1);
-    };
-
-  function moveObject (object) {
+  function updatePosition (object) {
     //use jquery to reposition the selected object on screen
     $(object.id).css("left", object.position.x);
     $(object.id).css("top", object.position.y);
+  };
+  function findPosNeg (object) {
+    //finds if an object is travelling left or right and returns 1 or -1
+    return (object.position.x < mouse.position.x? 1: -1);
   };
   function findSides (object) {
     //find the sides of any given object by using its width, height, x, and y
@@ -256,43 +249,18 @@ function runProgram(){
       left: object.position.x,
       top: object.position.y,
       bottom: object.position.y + object.height,
-    }
+    };
+    object.middle = {
+      x: object.position.x + (object.width/2),
+      y: object.position.y + (object.height/2),
+    };
   };
-  function capSpeed (object, xy) {
-    if (xy == "x") {
-      if (object.speed.x > 16) {
-        object.speed.x = 16
-      }
-      else if (object.speed.x < -16) {
-        object.speed.x = -16
-      };
+  function handleDrag(object) {
+    if (object.speed.x > 0) {
+      object.speed.x -= 2;
     }
-    if (xy == "y") {
-      if (object.speed.y > 16) {
-        object.speed.y = 16
-      }
-      else if (object.speed.y < -16) {
-        object.speed.y = -16;
-      }
-      handleDrag(object, 'y');
-    }
-  };
-  function handleDrag(object, xy) {
-    if (xy === "x") {
-      if (object.speed.x > 0) {
-        object.speed.x -= 2;
-      }
-      if (object.speed.x < 0) {
-        object.speed.x += 2;
-      }
-    }
-    if (xy === "y") {
-      if (object.speed.y > 0) {
-        object.speed.y -= 2;
-      }
-      if (object.speed.y < 0) {
-      object.speed.y += 2;
-      }
+    if (object.speed.x < 0) {
+      object.speed.x += 2;
     }
   };
   function wait (wait) {

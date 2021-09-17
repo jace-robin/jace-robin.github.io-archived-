@@ -22,10 +22,4 @@ body {
     height: 10px;
     position: relative;
     background-color: brown;
-    bottom: 10px;
-    
-  }
-  #playerinfo {
-    color: black;
-    size: 10%;
   }
