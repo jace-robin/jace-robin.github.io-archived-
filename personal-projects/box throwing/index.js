@@ -229,7 +229,7 @@ function updateText() {
   }
   function yeet(object, power) {
     setVelocityX(object, ((mouse.position.x - object.middle.x)/15)*power) * findPosNeg(player);
-    setVelocityY(object, ((mouse.position.y - object.middle.y)/20)*power) * findPosNeg(player);
+    setVelocityY(object, ((mouse.position.y - object.middle.y)/10)*power) * findPosNeg(player);
   };
   function setVelocityX (object, speed) {
     object.speed.x = speed;
