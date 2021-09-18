@@ -12,7 +12,7 @@ function runProgram(){
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
   var power = 1;
   var gravity = 2;
-  var drag = 2;
+  var drag = 1;
   // Game Item Objects
   var mouse = {
     position: {
