@@ -10,6 +10,9 @@ function runProgram(){
   // Constant Variables
   var FRAME_RATE = 60;
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
+  var power = 1;
+  var gravity = 2;
+  var drag = 2;
   // Game Item Objects
   var mouse = {
     position: {
@@ -90,6 +93,7 @@ function runProgram(){
   /* 
   Called in response to events.
   */
+
   function handleMouseMove(event) {
     //find mouse position
     mouse.position.x = event.pageX;
@@ -105,13 +109,13 @@ function runProgram(){
     var key = keycodes[event.which - 1];
     if (keysHeld.includes(key)) {
       keysHeld.splice(keysHeld.indexOf(key), 1);
-        }
+    }
   };
   function handleMouseDown(event) {
     mouse.held = true;
     $("#mouseHeld").text("held");
     //throw player
-    yeet(player, 2);
+    yeet(player, power);
   };
   function handleMouseUp() {
     mouse.held = false;
@@ -127,7 +131,25 @@ function runProgram(){
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////// HELPER FUNCTIONS ////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
-  
+
+  $('#powerBTN').click(function() {
+    power = $('#powerMult').val();
+    spawn();
+  });
+  $('#gravityBTN').click(function() {
+    gravity = $('#gravityMult').val();
+    spawn();
+  });
+  $('#dragBTN').click(function() {
+    drag = $('#dragMult').val();
+    spawn();
+  });
+  $('#boardBTN').click(function() {
+    var height = $('#boardHeight').val();
+    $('#board').css("height", height);
+    board.height = height;
+    spawn();
+  });
 //update text for debugging
 function updateText() {
   //mouse info
@@ -146,11 +168,12 @@ function updateText() {
   //called at the start of the game
   function spawn () {
     findSides(board);
-    player.position.x = board.position.x + player.width;
+    player.position.x = board.middle.x;
     player.position.y = board.height - player.height;
     //player.speed.x = 0;
     //player.speed.y = 0;
     floor.position.y = board.height;
+    updatePosition(board);
     updatePosition(floor);
     updatePosition(player);
     }
@@ -168,8 +191,8 @@ function updateText() {
     /*if (handleSideCollisions(player, floor, bottom, top)) {
       player.position.y -= player.speed.y;
     }*/
-    handleDrag(player, 1);
-    handleGravity(player, 1);
+    handleDrag(player, drag);
+    handleGravity(player, gravity);
   };
 //handles the meat of this program, uses the sides of both objects to see whether or not it has collided
   function handleCollisions (obj1, obj2) {
@@ -205,8 +228,8 @@ function updateText() {
     return distance;
   }
   function yeet(object, power) {
-    setVelocityX(object, ((mouse.position.x - object.middle.x)/10)*power) * findPosNeg(player);
-    setVelocityY(object, ((mouse.position.y - object.middle.y)/10)*power) * findPosNeg(player);
+    setVelocityX(object, ((mouse.position.x - object.middle.x)/15)*power) * findPosNeg(player);
+    setVelocityY(object, ((mouse.position.y - object.middle.y)/20)*power) * findPosNeg(player);
   };
   function setVelocityX (object, speed) {
     object.speed.x = speed;
@@ -258,7 +281,7 @@ function updateText() {
        // collision detected!
        return true;
     }
-  }
+  };
   function findSides (object) {
     //find the sides of any given object by using its width, height, x, and y
     object.sides = {
