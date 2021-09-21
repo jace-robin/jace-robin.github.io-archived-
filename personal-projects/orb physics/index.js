@@ -117,7 +117,7 @@ function runProgram() {
   }
   var objects = {
     physicsEnabled: {
-      orbs: 0,
+      orbs: [],
       players: 0,
       misc: 0,
     }
@@ -237,17 +237,18 @@ function handleKeyUp(event) {
     updatePosition(roof);
   };
   function handleClick() {
-    if (click.state == "placeOrb") {
+    //if (click.state == "placeOrb") {
       var name = newName("orb");
       objects.physicsEnabled.orbs[name] = factory(name, '#' + name, ".orb", mouse.position.x, mouse.position.y, "orb");
-      alert(objects.physicsEnabled.orbs);
-      alert(objects.physicsEnabled.orbs[name].name)
-      alert('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>');
-      $(objects.physicsEnabled.orbs[name].id).addClass("orb");
-      $("#board").append('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>');
-      //alert('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>')
-      updatePosition(objects.physicsEnabled.orbs[name]);
-    }
+      /*alert(objects.physicsEnabled.orbs[name].name);
+      alert(objects.physicsEnabled.orbs[name].id);
+      alert(objects.physicsEnabled.orbs[name].class);
+      alert(objects.physicsEnabled.orbs[name].position.x);
+      alert(objects.physicsEnabled.orbs[name].position.y);
+      alert(objects.physicsEnabled.orbs[name].type);*/
+      updateObject(objects.physicsEnabled.orbs[name]);
+      $("#board").append('<div class="orb" id="' + name + '"></div>');
+    //}
   };
 //new ID
   function newName (type) {
@@ -275,8 +276,6 @@ function handleKeyUp(event) {
         x: 0,
         y: 0,
       },
-      width: parseFloat($(cl).css('width')),
-      height: parseFloat($(cl).css('height')),
       type: type,
     }
     return (i);
