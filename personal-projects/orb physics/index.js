@@ -1,26 +1,31 @@
 /* global $, sessionStorage */
 
 $(document).ready(runProgram); // wait for the HTML / CSS elements of the page to fully load, then execute runProgram()
-
+var held = [];
+var power = 1;
+var drag = 1;
+var gravity = 1;
 function runProgram() {
   ////////////////////////////////////////////////////////////////////////////////
   //////////////////////////// SETUP /////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
-
   // Constant Variables
   var FRAME_RATE = 60;
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
   // Game Item Objects
-  var power = 1;
-  var drag = 1;
-  var gravity = 1;
+  simulation= {
+    state: String,
+  }
+  var click = {
+    state: "placeOrb",
+  }
   var mouse = {
     position: {
       x: 0,
       y: 0,
     },
     held: false,
-  }
+  };
   var board = {
     id: "#board",
     position: {
@@ -91,10 +96,37 @@ function runProgram() {
     height: parseFloat($('#player').css('height')),
     type: "player",
   };
+  var orb = {
+    class: ".orb",
+    id: "#orb",
+    position: {
+      x: 0,
+      y: 0,
+    },
+    middle: {
+      x: 0,
+      y: 0,
+    },
+    speed: {
+      x: 0,
+      y: 0,
+    },
+    width: parseFloat($('.orb').css('width')),
+    height: parseFloat($('.orb').css('height')),
+    type: "orb",
+  }
+  var objects = {
+    physicsEnabled: {
+      orbs: 0,
+      players: 0,
+      misc: 0,
+    }
+  };
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
   $(document).on('keydown', handleKeyDown);
   $(document).on('keyup', handleKeyUp);
+  $(document).on('click', handleClick);
   $(document).on('mousedown', handleMouseDown);
   $(document).on('mouseup', handleMouseUp);
   $(document).on('mousemove', handleMouseMove);
@@ -109,10 +141,10 @@ function runProgram() {
   by calling this function and executing the code inside.
   */
   function newFrame() {
-    handlePlayer();
-    setPosition(player);
-    updatePosition(player);
     updateText();
+    //handlePlayer();
+    //setPosition(player);
+    //updatePosition(player);
     //console.log (player);
   }
 
@@ -125,22 +157,38 @@ function runProgram() {
     mouse.position.y = event.pageY;
   }
   function handleKeyDown(event) {
-    var key = keycodes[event.which - 1];
-    if (!keysHeld.includes(key)) {
-      keysHeld.push(key);
+    var key = (keyObject[event.which]);
+    keyStatus[key] = true;
+    if (!held.includes(key)) {
+        held.push(key);
+    };
+    if (key === "space") {
+      if (simulation.state === "paused" || "stopped") {
+        simulation.state === "running";
+      }
+      else {
+
+      };
+    };
+    if (key === "1") {
+      click.state = "placeOrb";
+
     }
+    click.state = "placeOrb";
+    $("#keys").text(held);
   };
-  function handleKeyUp(event) {
-    var key = keycodes[event.which - 1];
-    if (keysHeld.includes(key)) {
-      keysHeld.splice(keysHeld.indexOf(key), 1);
-    }
+function handleKeyUp(event) {
+    var key = (keyObject[event.which]);
+    keyStatus[key] = false;
+    if (held.includes(key)) {
+        held.splice(held.indexOf(key), 1);
+    };
+    $("#keys").text(held);
   };
   function handleMouseDown() {
     mouse.held = true;
     $("#mouseHeld").text("held");
     //throw player
-    yeet(player, power);
   };
   function handleMouseUp() {
     mouse.held = false;
@@ -174,6 +222,7 @@ function runProgram() {
 
   //called at the start of the game
   function spawn() {
+    //factory("#orb1", ".orb", 70, 70, "orb");
     findSides(floor);
     findSides(board);
     findSides(roof);
@@ -187,29 +236,71 @@ function runProgram() {
     updatePosition(player);
     updatePosition(roof);
   };
+  function handleClick() {
+    if (click.state == "placeOrb") {
+      var name = newName("orb");
+      objects.physicsEnabled.orbs[name] = factory(name, '#' + name, ".orb", mouse.position.x, mouse.position.y, "orb");
+      alert(objects.physicsEnabled.orbs);
+      alert(objects.physicsEnabled.orbs[name].name)
+      alert('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>');
+      $(objects.physicsEnabled.orbs[name].id).addClass("orb");
+      $("#board").append('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>');
+      //alert('<div class="orb" id="' + objects.physicsEnabled.orbs[name].name + '"></div>')
+      updatePosition(objects.physicsEnabled.orbs[name]);
+    }
+  };
+//new ID
+  function newName (type) {
+    var num = Object.keys(objects.physicsEnabled.orbs).length;
+    var name = type + num;
+    return name;
+    
+  }
+
+  //factory
+  function factory (name, id, cl, x, y, type) {
+    var i = {
+      name: name,
+      id: id,
+      class: cl,
+      position: {
+        x: x,
+        y: y,
+      },
+      speed: {
+        x: 0,
+        y: 0,
+      },
+      middle: {
+        x: 0,
+        y: 0,
+      },
+      width: parseFloat($(cl).css('width')),
+      height: parseFloat($(cl).css('height')),
+      type: type,
+    }
+    return (i);
+  };
   //handles player movement and key presses
-  function handlePlayer() {
-    if (!handleCollisions(board, player)) {
+  function handlePlayer(object) {
+    if (!handleCollisions(board, object)) {
       spawn();
     }
-    if (handleCollisions(player, floor)) {
-      if (player.speed.y >= 0) {
-        player.speed.y = 0;
+    if (handleCollisions(floor, object)) {
+      if (object.speed.y >= 0) {
+        object.speed.y = 0;
       }
-      while (handleCollisions(player, floor)) {
-        player.position.y -= 1;
-      };
+      object.position.y -= 1;
+      
     }
-    if (handleCollisions(player, roof)) {
-      if (player.speed.y < 0) {
-        player.speed.y = 0;
+    if (handleCollisions(roof, object)) {
+      if (object.speed.y < 0) {
+        object.speed.y = 0;
       }
-      while (handleCollisions(player, roof)) {
-        player.position.y += 1;
-      }
+      object.position.y += 1;
     }
-    handleDrag(player, drag);
-    handleGravity(player, gravity);
+    handleDrag(object, drag);
+    handleGravity(object, gravity);
   };
   //handles the meat of this program, uses the sides of both objects to see whether or not it has collided
   function handleCollisions(obj1, obj2) {
@@ -244,11 +335,11 @@ function runProgram() {
     var distance = Math.abs(obj1.middle[xy] - obj2.middle[xy]);
     return distance;
   }
-  function yeet(object, power) {
+  /*function yeet(object, power) {
     findSides(object);
     setVelocityX(object, (((mouse.position.x - object.middle.x) / 10) * power));
     setVelocityY(object, ((mouse.position.y - object.middle.y) / 10) * power);
-  };
+  };*/
   function setVelocityX(object, speed) {
     object.speed.x = speed;
   };
