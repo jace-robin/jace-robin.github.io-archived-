@@ -116,10 +116,12 @@ function runProgram() {
     type: "orb",
   }
   var objects = {
+    physicsEnabled: {
       orbs: [],
-      players: [],
-      misc: [],
+      players: 0,
+      misc: 0,
       all: [],
+    }
   };
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
@@ -141,7 +143,7 @@ function runProgram() {
   */
   function newFrame() {
     updateText();
-    handleOrbs();
+    //handleOrbs();
     //setPosition(player);
     //updatePosition(player);
     //console.log (player);
@@ -173,7 +175,7 @@ function runProgram() {
       click.state = "placeOrb";
     };
     if (key === "r") {
-      objects.orbs = [];
+      objects.physicsEnabled.orbs = [];
     };
     click.state = "placeOrb";
     $("#keys").text(held);
@@ -217,8 +219,8 @@ function handleKeyUp(event) {
     $("#speedX").text("speed x: " + player.speed.x);
     $("#speedY").text("speed y: " + player.speed.y);
     //distance info
-    //$("#distanceX").text("distance middle: " + distanceTo(player, floor, "x"));
-    //$("#distanceY").text("distance floor: " + distanceTo(player, floor, "y"));
+    $("#distanceX").text("distance middle: " + distanceTo(player, floor, "x"));
+    $("#distanceY").text("distance floor: " + distanceTo(player, floor, "y"));
   }
 
   //called at the start of the game
@@ -238,25 +240,24 @@ function handleKeyUp(event) {
   };
   function handleClick() {
     if (click.state == "placeOrb") {
+      console.log (Object.keys(objects.physicsEnabled.orbs).length)
       //find new name
-      var name = newName("orbs");
+      var name = newName("orb");
       //set the object.physicsEnabled.orbs index to the created object
       var x = mouse.position.x;
       var y = mouse.position.y;
-      objects.orbs[name] = factory(name, '#' + name, ".orb", x, y, "orb");
+      objects.physicsEnabled.orbs[name] = factory("orb" + name, '#' + name, ".orb", x, y, "orb");
       //append the newly created object to the body, when using board the x and y is messed with. find a solution eventually
       $("body").append('<div class="orb" id="' + name + '"></div>');
       //update position so the orb shows;
-      updatePosition(objects.orbs[name]);
+      updatePosition(objects.physicsEnabled.orbs[name]);
     }
   };
 //new ID
   function newName (type) {
     //find new name by finding how many objects of this type are currently on screen and return
-    var num = Object.keys(objects[type]).length;
-    console.log(num);
-    var name = num;
-    return name;
+    var num = Object.keys(objects.physicsEnabled[type]).length;
+    return num;
   }
 
   //factory
@@ -265,7 +266,6 @@ function handleKeyUp(event) {
       name: name,
       id: id,
       class: cl,
-      type: type,
       position: {
         x: x,
         y: y,
@@ -284,21 +284,22 @@ function handleKeyUp(event) {
         top: 0,
         bottom: 0,
       },
+      width: parseFloat($(cl).css('width')),
+      height: parseFloat($(cl).css('height')),
+      type: type,
     }
     return (i);
   };
   //loop over objects in use
   function handleOrbs () {
-    for (var i = 0; i >= Object.keys(objects.orbs).length; i++) {
-    objects.orbs[i].sides = findSides(objects.orbs[i]);
-    handlePlayer(objects.orbs[i]);
-    setPosition(objects.orbs[i]);
-    updatePosition(objects.orbs[i]);
+    for (var i = 0; i <= Object.keys(objects.physicsEnabled.orbs).length; i++) {
+      //handlePlayer(objects.physicsEnabled.orbs[i]);
+      updatePosition(objects.physicsEnabled.orbs[i]);
     };
   }
   //handles player movement and key presses
   function handlePlayer(object) {
-    /*if (!handleCollisions(board, object)) {
+    if (!handleCollisions(board, object)) {
       spawn();
     }
     if (handleCollisions(floor, object)) {
@@ -313,7 +314,7 @@ function handleKeyUp(event) {
         object.speed.y = 0;
       }
       object.position.y += 1;
-    }*/
+    }
     handleDrag(object, drag);
     handleGravity(object, gravity);
   };
@@ -347,7 +348,7 @@ function handleKeyUp(event) {
       }*/
   };
   function distanceTo(obj1, obj2, xy) {
-    var distance = Math.abs([obj1].middle[xy] - [obj2].middle[xy]);
+    var distance = Math.abs(obj1.middle[xy] - obj2.middle[xy]);
     return distance;
   }
   /*function yeet(object, power) {
@@ -378,12 +379,12 @@ function handleKeyUp(event) {
   }*/
 
   function handleGravity(object, gravity) {
-    //if (!handleCollisions(floor, object)) {
+    if (!handleCollisions(floor, object)) {
       object.speed.y += gravity;
-    //};
-    //if (handleCollisions(floor, object)) {
+    };
+    if (handleCollisions(floor, object)) {
       //add function in response to touching floor here
-    //};
+    };
   };
   function setPosition(object) {
     object.position.y += object.speed.y;
