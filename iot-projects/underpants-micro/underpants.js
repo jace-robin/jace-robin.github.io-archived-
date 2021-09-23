@@ -20,6 +20,9 @@ var _ = {};
 *   _.identity(5) === 5
 *   _.identity({a: "b"}) === {a: "b"}
 */
+function identity (val) {
+    return val;
+}
 
 
 
@@ -37,7 +40,14 @@ var _ = {};
 *   _.indexOf(["a","b","c"], "c") -> 2
 *   _.indexOf(["a","b","c"], "d") -> -1
 */
-
+function indexOf(array, val) {
+    if (array.contains(val)) {
+        return array.indexOf(val);
+    }
+    else {
+        return -1
+    };
+}
 
 
 /** _.contains
@@ -53,7 +63,17 @@ var _ = {};
 * Examples:
 *   _.contains([1,"two", 3.14], "two") -> true
 */
-
+function contains (array, val) {
+    if (array.contains(val)) {
+        return true;
+    }
+    else if (val == undefined) {
+        return "undefined";
+    }
+    else {
+        return false;
+    };
+}
 
 
 /** _.each
@@ -68,7 +88,11 @@ var _ = {};
 *   _.each(["a","b","c"], function(e,i,a){ console.log(e)});
 *      -> should log "a" "b" "c" to the console
 */
-
+function each(collection, func) {
+    if (collection == []) {
+        func()
+    }
+}
 
 
 /** _.filter

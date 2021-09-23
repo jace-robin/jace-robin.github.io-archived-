@@ -14,11 +14,11 @@ function runProgram() {
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
   // Game Item Objects
   simulation= {
-    state: String,
-  }
+    state: "paused",
+  };
   var click = {
     state: "placeOrb",
-  }
+  };
   var mouse = {
     position: {
       x: 0,
@@ -141,7 +141,9 @@ function runProgram() {
   */
   function newFrame() {
     updateText();
-    handleOrbs();
+    if (simulation.state === "running") {
+      handleOrbs();
+    };
     //setPosition(player);
     //updatePosition(player);
     //console.log (player);
@@ -241,11 +243,11 @@ function handleKeyUp(event) {
       //find new name
       var name = newName("orbs");
       //set the object.physicsEnabled.orbs index to the created object
-      var x = mouse.position.x;
-      var y = mouse.position.y;
-      objects.orbs[name] = factory(name, '#' + name, ".orb", x, y, "orb");
+      objects.orbs[name] = factory(name, '#' + name, ".orb", mouse.position.x, mouse.position.y, "orb");
+      updatePosition(objects.orbs[name]);
+      alert (objects.orbs[name].x + objects.orbs[name].y);
       //append the newly created object to the body, when using board the x and y is messed with. find a solution eventually
-      $("body").append('<div class="orb" id="' + name + '"></div>');
+      $("#board").append('<div class="orb" id="' + name + '"></div>');
       //update position so the orb shows;
       updatePosition(objects.orbs[name]);
     }
@@ -253,7 +255,7 @@ function handleKeyUp(event) {
 //new ID
   function newName (type) {
     //find new name by finding how many objects of this type are currently on screen and return
-    var num = Object.keys(objects[type]).length;
+    var num = objects[type].length;
     console.log(num);
     var name = num;
     return name;
@@ -289,11 +291,11 @@ function handleKeyUp(event) {
   };
   //loop over objects in use
   function handleOrbs () {
-    for (var i = 0; i >= Object.keys(objects.orbs).length; i++) {
-    objects.orbs[i].sides = findSides(objects.orbs[i]);
-    handlePlayer(objects.orbs[i]);
-    setPosition(objects.orbs[i]);
-    updatePosition(objects.orbs[i]);
+    for (var i = 0; i >= objects.orbs.length; i++) {
+      findSides(objects.orbs[i].name);
+      handlePlayer(objects.orbs[i].name);
+      setPosition(objects.orbs[i].name);
+      updatePosition(objects.orbs[i].name);
     };
   }
   //handles player movement and key presses
@@ -323,10 +325,10 @@ function handleKeyUp(event) {
     findSides(obj2);
     //if colliding with player
 
-    if (obj1.sides.left <= obj2.sides.right &&
-      obj1.sides.right >= obj2.sides.left &&
-      obj1.sides.top <= obj2.sides.bottom &&
-      obj1.sides.bottom >= obj2.sides.top) {
+    if (objects.orbs[obj1].sides.left <= objects.orbs[obj2].sides.right &&
+      objects.orbs[obj1].sides.right >= objects.orbs[obj2].sides.left &&
+      objects.orbs[obj1].sides.top <= objects.orbs[obj2].sides.bottom &&
+      objects.orbs[obj1].sides.bottom >= objects.orbs[obj2].sides.top) {
       // collision detected!
       return true;
     }
@@ -347,7 +349,7 @@ function handleKeyUp(event) {
       }*/
   };
   function distanceTo(obj1, obj2, xy) {
-    var distance = Math.abs([obj1].middle[xy] - [obj2].middle[xy]);
+    var distance = Math.abs(objects.orbs[obj1].middle[xy] - objects.orbs[obj2].middle[xy]);
     return distance;
   }
   /*function yeet(object, power) {
@@ -356,10 +358,10 @@ function handleKeyUp(event) {
     setVelocityY(object, ((mouse.position.y - object.middle.y) / 10) * power);
   };*/
   function setVelocityX(object, speed) {
-    object.speed.x = speed;
+    objects.orbs[object].speed.x = speed;
   };
   function setVelocityY(object, speed) {
-    object.speed.y = speed;
+    objects.orbs[object].speed.y = speed;
   };
   /*function create(id, type, x, y, speedx, speedy, width, height) {
     var object = {
@@ -379,52 +381,52 @@ function handleKeyUp(event) {
 
   function handleGravity(object, gravity) {
     //if (!handleCollisions(floor, object)) {
-      object.speed.y += gravity;
+      objects.orbs[object].speed.y += gravity;
     //};
     //if (handleCollisions(floor, object)) {
       //add function in response to touching floor here
     //};
   };
   function setPosition(object) {
-    object.position.y += object.speed.y;
-    object.position.x += object.speed.x;
+    objects.orbs[object].position.y += objects.orbs[object].speed.y;
+    objects.orbs[object].position.x += objects.orbs[object].speed.x;
   }
   function updatePosition(object) {
     //use jquery to reposition the selected object on screen
-    $(object.id).css("left", object.position.x);
-    $(object.id).css("top", object.position.y);
+    $(objects.orbs[object].id).css("left", objects.orbs[object].position.x);
+    $(objects.orbs[object].id).css("top", objects.orbs[object].position.y);
   };
   function findPosNeg(object) {
     //finds if an object is travelling left or right and returns 1 or -1
-    return (object.position.x > mouse.position.x ? 1 : -1);
+    return (objects.orbs[object].position.x > mouse.position.x ? 1 : -1);
   };
   function handleSideCollisions(obj1, obj2, side1, side2) {
     findSides(obj1);
     findSides(obj2);
-    if (obj1.sides[side1] <= obj2.sides[side2]) {
+    if (objects.orbs[obj1].sides[side1] <= objects.orbs[obj2].sides[side2]) {
       // collision detected!
       return true;
     }
   }
   function findSides(object) {
     //find the sides of any given object by using its width, height, x, and y
-    object.sides = {
-      right: object.position.x + object.width,
-      left: object.position.x,
-      top: object.position.y,
-      bottom: object.position.y + object.height,
+    objects.orbs[object].sides = {
+      right: objects.orbs[object].position.x + objects.orbs[object].width,
+      left: objects.orbs[object].position.x,
+      top: objects.orbs[object].position.y,
+      bottom: objects.orbs[object].position.y + objects.orbs[object].height,
     };
-    object.middle = {
-      x: object.position.x + (object.width / 2),
-      y: object.position.y + (object.height / 2),
+    objects.orbs[object].middle = {
+      x: objects.orbs[object].position.x + (objects.orbs[object].width / 2),
+      y: objects.orbs[object].position.y + (objects.orbs[object].height / 2),
     };
   };
   function handleDrag(object, drag) {
-    if (object.speed.x > 0) {
-      object.speed.x = Math.max(0, object.speed.x - drag);
+    if (objects.orbs[object].speed.x > 0) {
+      objects.orbs[object].speed.x = Math.max(0, objects.orbs[object].speed.x - drag);
     }
-    if (object.speed.x < 0) {
-      object.speed.x = Math.min(0, object.speed.x + drag);
+    if (objects.orbs[object].speed.x < 0) {
+      objects.orbs[object].speed.x = Math.min(0, objects.orbs[object].speed.x + drag);
     }
   };
   function wait(wait) {
