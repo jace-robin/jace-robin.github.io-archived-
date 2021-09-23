@@ -14,7 +14,7 @@ function runProgram() {
   var FRAMES_PER_SECOND_INTERVAL = 1000 / FRAME_RATE;
   // Game Item Objects
   simulation= {
-    state: "paused",
+    state: undefined,
   };
   var click = {
     state: "placeOrb",
@@ -25,76 +25,6 @@ function runProgram() {
       y: 0,
     },
     held: false,
-  };
-  var board = {
-    id: "#board",
-    position: {
-      x: 0,
-      y: 0,
-    },
-    middle: {
-      x: 0,
-      y: 0,
-    },
-    width: parseFloat($('#board').css('width')),
-    height: parseFloat($('#board').css('height')),
-    type: "board",
-  };
-  var floor = {
-    id: "#floor",
-    position: {
-      x: 0,
-      y: 0,
-    },
-    sides: {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-    },
-    width: parseFloat($('#floor').css('width')),
-    height: parseFloat($('#floor').css('height')),
-    type: "floor",
-  };
-  var roof = {
-    id: "#roof",
-    position: {
-      x: 0,
-      y: 0,
-    },
-    sides: {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-    },
-    width: parseFloat($('#roof').css('width')),
-    height: parseFloat($('#roof').css('height')),
-    type: "roof",
-  };
-  var player = {
-    id: "#player",
-    position: {
-      x: 0,
-      y: 0,
-    },
-    middle: {
-      x: 0,
-      y: 0,
-    },
-    sides: {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-    },
-    speed: {
-      x: 0,
-      y: 0,
-    },
-    width: parseFloat($('#player').css('width')),
-    height: parseFloat($('#player').css('height')),
-    type: "player",
   };
   var orb = {
     class: ".orb",
@@ -118,8 +48,82 @@ function runProgram() {
   var objects = {
       orbs: [],
       players: [],
-      misc: [],
+      board: [],
       all: [],
+      board: {
+        id: "#board",
+        name: 1,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        middle: {
+          x: 0,
+          y: 0,
+        },
+        width: parseFloat($('#board').css('width')),
+        height: parseFloat($('#board').css('height')),
+        type: "board",
+      },
+      floor: {
+        id: "#floor",
+        name: 1,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        sides: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        width: parseFloat($('#floor').css('width')),
+        height: parseFloat($('#floor').css('height')),
+        type: "floor",
+      },
+      roof: {
+        id: "#roof",
+        name: 1,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        sides: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        width: parseFloat($('#roof').css('width')),
+        height: parseFloat($('#roof').css('height')),
+        type: "roof",
+      },
+      player: {
+        id: "#player",
+        name: 1,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        middle: {
+          x: 0,
+          y: 0,
+        },
+        sides: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        speed: {
+          x: 0,
+          y: 0,
+        },
+        width: parseFloat($('#player').css('width')),
+        height: parseFloat($('#player').css('height')),
+        type: "player",
+      },
   };
   // one-time setup
   var interval = setInterval(newFrame, FRAMES_PER_SECOND_INTERVAL);   // execute newFrame every 0.0166 seconds (60 Frames per second)
@@ -131,6 +135,7 @@ function runProgram() {
   $(document).on('mousemove', handleMouseMove);
   //spawn positioning
   spawn();
+  simulation.state = "paused";
   ////////////////////////////////////////////////////////////////////////////////
   ///////////////////////// CORE LOGIC ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -164,12 +169,13 @@ function runProgram() {
         held.push(key);
     };
     if (key === "space") {
-      if (simulation.state === "paused" || "stopped") {
+      if (simulation.state === "paused") {
         simulation.state === "running";
-      }
-      else {
+      };
+      if (simulation.state === "running") {
         simulation.state === "paused";
       };
+      console.log(simulation.state)
     };
     if (key === "1") {
       click.state = "placeOrb";
@@ -214,10 +220,10 @@ function handleKeyUp(event) {
     $("#mouseX").text("mouse x: " + mouse.position.x);
     $("#mouseY").text("mouse y: " + mouse.position.y);
     //player info
-    $("#playerX").text("player x: " + player.position.x);
-    $("#playerY").text("player y: " + player.position.y);
-    $("#speedX").text("speed x: " + player.speed.x);
-    $("#speedY").text("speed y: " + player.speed.y);
+    $("#playerX").text("player x: " + objects.player.position.x);
+    $("#playerY").text("player y: " + objects.player.position.y);
+    $("#speedX").text("speed x: " + objects.player.speed.x);
+    $("#speedY").text("speed y: " + objects.player.speed.y);
     //distance info
     //$("#distanceX").text("distance middle: " + distanceTo(player, floor, "x"));
     //$("#distanceY").text("distance floor: " + distanceTo(player, floor, "y"));
@@ -226,17 +232,17 @@ function handleKeyUp(event) {
   //called at the start of the game
   function spawn() {
     //factory("#orb1", ".orb", 70, 70, "orb");
-    findSides(floor);
-    findSides(board);
-    findSides(roof);
-    player.position.x = board.middle.x + player.width;
-    player.position.y = board.height - player.height;
+    findSides(objects.floor);
+    findSides(objects.board);
+    findSides(objects.roof);
+    objects.player.position.x = objects.board.middle.x + objects.player.width;
+    objects.player.position.y = objects.board.height - objects.player.height;
     //player.speed.x = 0;
     //player.speed.y = 0;
-    roof.position.y = board.position.x - roof.height;
-    floor.position.y = board.height - floor.height;
-    updatePosition(floor);
-    updatePosition(roof);
+    objects.roof.position.y = objects.board.position.x - objects.roof.height;
+    objects.floor.position.y = objects.board.height - objects.floor.height;
+    updatePosition(objects.floor);
+    updatePosition(objects.roof);
   };
   function handleClick() {
     if (click.state == "placeOrb") {
@@ -244,12 +250,12 @@ function handleKeyUp(event) {
       var name = newName("orbs");
       //set the object.physicsEnabled.orbs index to the created object
       objects.orbs[name] = factory(name, '#' + name, ".orb", mouse.position.x, mouse.position.y, "orb");
-      updatePosition(objects.orbs[name]);
-      alert (objects.orbs[name].x + objects.orbs[name].y);
+      console.log(objects.orbs[name]);
+      updatePosition(objects.orbs[name].name);
       //append the newly created object to the body, when using board the x and y is messed with. find a solution eventually
-      $("#board").append('<div class="orb" id="' + name + '"></div>');
+      $("body").append('<div class="orb" id="' + name + '"></div>');
       //update position so the orb shows;
-      updatePosition(objects.orbs[name]);
+      updatePosition(objects.orbs[name].name);
     }
   };
 //new ID
@@ -286,6 +292,8 @@ function handleKeyUp(event) {
         top: 0,
         bottom: 0,
       },
+      width: parseFloat($("'" + id + "'").css('width')),
+      height: parseFloat($("'" + id + "'").css('height')),
     }
     return (i);
   };
@@ -300,7 +308,7 @@ function handleKeyUp(event) {
   }
   //handles player movement and key presses
   function handlePlayer(object) {
-    /*if (!handleCollisions(board, object)) {
+    if (!handleCollisions(board, object)) {
       spawn();
     }
     if (handleCollisions(floor, object)) {
@@ -315,7 +323,7 @@ function handleKeyUp(event) {
         object.speed.y = 0;
       }
       object.position.y += 1;
-    }*/
+    }
     handleDrag(object, drag);
     handleGravity(object, gravity);
   };
@@ -323,6 +331,8 @@ function handleKeyUp(event) {
   function handleCollisions(obj1, obj2) {
     findSides(obj1);
     findSides(obj2);
+    var obj1Name = objects[obj1];
+    var obj2Name;
     //if colliding with player
 
     if (objects.orbs[obj1].sides.left <= objects.orbs[obj2].sides.right &&

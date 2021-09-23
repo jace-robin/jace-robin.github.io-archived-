@@ -20,9 +20,9 @@ var _ = {};
 *   _.identity(5) === 5
 *   _.identity({a: "b"}) === {a: "b"}
 */
-function identity (val) {
-    return val;
-}
+_.identity = function (value) {
+    return value;
+};
 
 
 
@@ -40,14 +40,14 @@ function identity (val) {
 *   _.indexOf(["a","b","c"], "c") -> 2
 *   _.indexOf(["a","b","c"], "d") -> -1
 */
-function indexOf(array, val) {
-    if (array.contains(val)) {
-        return array.indexOf(val);
+_.indexOf = function(array, value) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === value) {
+            return i;
+        }
     }
-    else {
-        return -1
-    };
-}
+    return -1;
+};
 
 
 /** _.contains
@@ -63,17 +63,14 @@ function indexOf(array, val) {
 * Examples:
 *   _.contains([1,"two", 3.14], "two") -> true
 */
-function contains (array, val) {
-    if (array.contains(val)) {
-        return true;
+_.contains = function (array, value) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === value) {
+            return true;
+        }
     }
-    else if (val == undefined) {
-        return "undefined";
-    }
-    else {
-        return false;
-    };
-}
+    return false;
+};
 
 
 /** _.each
@@ -88,11 +85,13 @@ function contains (array, val) {
 *   _.each(["a","b","c"], function(e,i,a){ console.log(e)});
 *      -> should log "a" "b" "c" to the console
 */
-function each(collection, func) {
-    if (collection == []) {
-        func()
+_.each = function (collection, func) {
+    if (Array.isArray(collection)) {
+        for (var i = 0; i < collection.length; i++) {
+            func(collection[i], i, collection);
+        }
     }
-}
+};
 
 
 /** _.filter
@@ -110,7 +109,15 @@ function each(collection, func) {
 * Challenge:
 *   use _.each in your implementation
 */
-
+_.filter = function(array, func) {
+    var newArray = [];
+    for (var i = 0; i < array.length; i++) {
+        if (func(array[i], i, array) === true) {
+            newArray.push(array[i]);
+        }
+    };
+    return newArray;
+};
 
 
 /** _.reject
@@ -125,7 +132,15 @@ function each(collection, func) {
 * Examples:
 *   _.reject([1,2,3,4,5], function(e){return e%2 === 0}) -> [1,3,5]
 */
-
+_.reject = function(array, func) {
+    var newArray = [];
+    for (var i = 0; i < array.length; i++) {
+        if (func(array[i], i, array) === false) {
+            newArray.push(array[i]);
+        }
+    }
+    return newArray;
+}
 
 
 /** _.map
@@ -141,7 +156,15 @@ function each(collection, func) {
 * Examples:
 *   _.map([1,2,3,4], function(e){return e * 2}) -> [2,4,6,8]
 */
-
+_.map = function (collection, func) {
+    var newArray = [];
+    if (Array.isArray(collection)) {
+        for (var i = 0; i < collection.length; i++) {
+            newArray.push(func(collection[i], i, collection))
+        }
+    };
+    return newArray;
+}
 
 
 //////////////////////////////////////////////////////////////////////
