@@ -50,6 +50,7 @@ function runProgram() {
       players: [],
       board: [],
       all: [],
+      blocks:[];
       board: {
         id: "#board",
         name: 1,
@@ -243,6 +244,14 @@ function handleKeyUp(event) {
     objects.floor.position.y = objects.board.height - objects.floor.height;
     updatePosition(objects.floor);
     updatePosition(objects.roof);
+    function oneTime() {
+      //make the game board
+      objects.blocks[0] = factory("1", "#board", ".board", 0, 0, "board");
+      $("body").append('<div class="board" id="board"></div>');
+      //make the floor
+      objects.blocks[0] = factory("1", "#board", ".board", 0, 0, "board");
+      $("#board").append('<div class="board" id="board"></div>');
+    }
   };
   function handleClick() {
     if (click.state == "placeOrb") {

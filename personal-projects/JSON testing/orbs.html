@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orb Physics</title>
+    <!-- Load CSS files -->
+    <link rel="stylesheet" type="text/css" href="index.css">
+    
+    <!-- Load JavaScript files -->
+    <script src="jquery.min.js"></script>
+    <script src="index.js"></script>
+    <script src="keycodescript.js"></script>
+  </head>
+  
+  <body>
+    <center><h1>Orbs Physics Test</h1></center>
+    <center><h4>Its a test, not working yet</h4></center>
+    <center>
+      <div id='board'>
+        <div id='roof'></div>
+        <div id='player'></div>
+        <div id='floor'></div>
+      </div>
+    </center>
+    <div id="keys"></div>
+    <div id="mouseInfo">
+      <p id='mouseX'>
+        x
+      </p>
+      <p id='mouseY'>
+        y
+      </p>
+      <p id='mouseHeld'>
+        held
+      </p>
+    </div>
+    <break></break>
+    <div id="playerInfo">
+      <p id='playerX'>
+        x
+      </p>
+      <p id='playerY'>
+        y
+      </p>
+      <p id='speedX'>
+        speed x
+      </p>
+      <p id='speedY'>
+        speed y
+      </p>
+    </div>
+    <break></break>
+    <div id='player/floor info'>
+      <p id='distanceX'>
+        x
+      </p>
+      <p id='distanceY'>
+        y
+      </p>
+    </div>
+    <div>
+      <p>Dont actually use these please its broken :(. itll do something, but expect it to break.</p>
+      <div>
+        <input type="number" id="powerMult">
+        <button type="button" id="powerBTN">Set Power</button>
+      </div>
+      <div>
+        <input type="number" id="gravityMult">
+        <button type="button" id="gravityBTN">Set Gravity</button>
+      </div>
+      <div>
+        <input type="number" id="dragMult">
+        <button type="button" id="dragBTN">Set Drag</button>
+      </div>
+      <div>
+        <input type="number" id="boardHeight">
+        <button type="button" id="boardBTN">Set Board Height</button>
+      </div>
+    </div>
+  </body>
+</html>
