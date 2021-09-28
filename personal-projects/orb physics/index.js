@@ -50,7 +50,7 @@ function runProgram() {
       players: [],
       board: [],
       all: [],
-      blocks:[];
+      blocks:[],
       board: {
         id: "#board",
         name: 1,
@@ -341,7 +341,7 @@ function handleKeyUp(event) {
     findSides(obj1);
     findSides(obj2);
     var obj1Name = objects[obj1];
-    var obj2Name;
+    var obj2Name = objects[obj2];
     //if colliding with player
 
     if (objects.orbs[obj1].sides.left <= objects.orbs[obj2].sides.right &&
@@ -410,7 +410,12 @@ function handleKeyUp(event) {
     objects.orbs[object].position.y += objects.orbs[object].speed.y;
     objects.orbs[object].position.x += objects.orbs[object].speed.x;
   }
-  function updatePosition(object) {
+  function updatePositionOrb(object) {
+    //use jquery to reposition the selected object on screen
+    $(objects.orbs[object].id).css("left", objects.orbs[object].position.x);
+    $(objects.orbs[object].id).css("top", objects.orbs[object].position.y);
+  };
+  function updatePositionBlocks(object) {
     //use jquery to reposition the selected object on screen
     $(objects.orbs[object].id).css("left", objects.orbs[object].position.x);
     $(objects.orbs[object].id).css("top", objects.orbs[object].position.y);
