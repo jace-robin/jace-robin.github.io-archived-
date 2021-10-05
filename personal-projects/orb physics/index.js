@@ -232,6 +232,7 @@ function handleKeyUp(event) {
   //called at the start of the game
   function spawn() {
     //factory("#orb1", ".orb", 70, 70, "orb");
+    objects.board[0] = factory("board", "#board", ".board", 0, 0, "board", )
     findSides(objects.floor);
     findSides(objects.board);
     findSides(objects.roof);
