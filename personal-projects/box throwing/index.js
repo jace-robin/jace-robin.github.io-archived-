@@ -2,17 +2,7 @@
 
 $(document).ready(runProgram); // wait for the HTML / CSS elements of the page to fully load, then execute runProgram()
 var counter;
-function yay(){
-  if(this.counter !== undefined){
-    counter = counter + 1;
-  } else {
-    counter = 10;
-  };
-}
-  yay();
-  console.log(counter)
-  yay();
-  console.log(counter);
+
 function runProgram() {
   ////////////////////////////////////////////////////////////////////////////////
   //////////////////////////// SETUP /////////////////////////////////////////////
