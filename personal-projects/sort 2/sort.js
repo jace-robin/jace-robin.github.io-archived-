@@ -13,13 +13,25 @@ function runProgram() {
 
     function setArray (string) {
         var arrayReturn = [];
-        var arrayIndex = 0
+        var arrayIndex = 0;
         for (var i = 0; i >= string.length; i++) {
-            if (string.charAt(i) === "," || string.charAt(i) === " ") {
+            if (checkNum()) {
+                
                 arrayIndex += 1;
             }
-            else if ((string.charAt(i)).parseFloat === Number) {
-                arrayReturn[arrayIndex]
+            else {
+                arrayReturn[arrayIndex] = string.charAt(i);
+                if (checkNum(string, i + 1)) {
+
+                }
+            }
+            function checkNum(array, index) {
+                if (array.charAt(index) === "_") {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         }
     }
