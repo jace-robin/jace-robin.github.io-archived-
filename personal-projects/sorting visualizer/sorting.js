@@ -2,7 +2,7 @@ $(document).ready(runProgram);
 
 
 function runProgram () {
-    alert("sorting");
+    var _ = require('assist.js');
     var nums = []
     setupFrame();
     $("#setNums").click(function(){
