@@ -2,8 +2,10 @@
 const http = require('http');
 const request = require('request');
 var port = 8686;
+var args = process.argv.slice(2);
 http.createServer(function(req,res) {
-   request("https://github.com/jace-robin/jace-robin.github.io", function(error, response, body) {
+    var url = args[0] ? args[0] : "https://jace-robin.github.io/portfolio.html";
+    request(url, function(error, response, body) {
         if (!body || !response || (error === null && response.statusCode !== 200)) {
             res.end("bad URL\n");
             return;
