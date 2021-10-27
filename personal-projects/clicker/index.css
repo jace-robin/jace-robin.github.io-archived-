@@ -1,0 +1,32 @@
+
+body {
+    background-color: grey;
+  }
+  #gameboard {
+    width: 100%;
+    height: 100%;
+    border: 1px solid white;
+    background-color: black;
+    position: relative;
+    user-select: none;
+  }
+  #click {
+    background-color: white;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-top: 20%;
+    user-select: none;
+  }
+  #money {
+    padding-top: 40px;
+    background-color: white; 
+    margin-top: 30px;
+    margin-left: 40%;
+    margin-right: 40%;
+    user-select: none;
+  }
+  #moneycount {
+      color: black;
+      user-select: none;
+  }

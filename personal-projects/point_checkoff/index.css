@@ -1,0 +1,28 @@
+body {
+    background-color: lightblue;
+    user-select: none;
+};
+.board {
+    background-color: lightcoral;
+};
+.checkboxholder {
+    width: 80%;
+    height: 30px;
+    border: 3px, solid, darkblue;
+    background-color: violet;
+};
+.checkboxentry {
+    background-color: teal;
+};
+.aligncenter {
+    text-align: center;
+};
+.ul {
+    border-top: 3px, solid, darkblue;
+};
+.li {
+    list-style-type: none;
+};
+#sketchboxes {
+    display: block;
+};

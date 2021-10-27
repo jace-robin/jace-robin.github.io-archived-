@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Platformer</title>
+    <!-- Load CSS files -->
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+    <!-- Load JavaScript files -->
+    <script src="jquery.min.js"></script>
+    <script src="checklist.js"></script>
+</head>
+
+<body>
+    <center>
+        <h1>Checklist for Amino</h1>
+    </center>
+    <center>
+        <h4>I have no idea what im doing</h4>
+    </center>
+    <div id="board">
+        <center>
+            <div>
+                <button id="sketch" onclick="toggleSketch()">Sketch</button>
+                <button id="lineart" onclick=toggleLineart()>Lineart</button>
+                <button id="lineless" onclick=toggleLineless()>Lineless</button>
+            </div>
+        </center>
+    </div>
+    <div id="sketchboxes">
+        <label for="vehicle1"> Flat Colors</label><br>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike"><br>
+        <input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
+        <label for="vehicle2"> I have a car</label><br>
+        <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat">
+        <label for="vehicle3"> I have a boat</label><br>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+        <label for="vehicle1"> I have a bike</label><br>
+        <input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
+        <label for="vehicle2"> I have a car</label><br>
+        <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat">
+        <label for="vehicle3"> I have a boat</label><br>
+        <input type="submit" value="Submit">
+    </div>
+</body>
+
+</html>

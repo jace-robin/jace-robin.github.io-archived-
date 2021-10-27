@@ -1,0 +1,1 @@
+var money, cps, minions;

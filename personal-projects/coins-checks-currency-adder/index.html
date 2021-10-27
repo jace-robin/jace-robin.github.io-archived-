@@ -1,0 +1,96 @@
+<html>
+
+<head>
+    <title>Coins Adder</title>
+    <style>
+        @import "calculator.css";
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="calculator.js"></script>
+</head>
+
+<body>
+    <div id="topbar">
+        <center>
+            <h1>Currency/ATM Calculator</h1>
+        </center>
+    </div>
+    <div id="textboxes">
+        <center>
+            <div id="checkdiv" class="textboxdiv">
+                <h4>Checks</h4>
+                <div id="checkboxdiv">
+                </div>
+                <button type="button" id="addCheck">Add New Check</button>
+                <button type="button" id="removeCheck">Remove Last Check(WIP)</button>
+            </div>
+        </center>
+        <center>
+            <div id="currencydiv" class="textboxdiv">
+                <h4>Cash</h4>
+                <div>
+                    <input type="number" id="hundreds">
+                    <p>^ Hundreds ^</p>
+                </div>
+                <div>
+                    <input type="number" id="fifties">
+                    <p>^ Fifties ^</p>
+                </div>
+                <div>
+                    <input type="number" id="twenties">
+                    <p>^ Twenties ^</p>
+                </div>
+                <div>
+                    <input type="number" id="tens">
+                    <p>^ Tens ^</p>
+                </div>
+                <div>
+                    <input type="number" id="fives">
+                    <p>^ Fives ^</p>
+                </div>
+                <div>
+                    <input type="number" id="ones">
+                    <p>^ Ones ^</p>
+                </div>
+            </div>
+        </center>
+        <center>
+            <div id="coinsdiv" class="textboxdiv">
+                <h4>Coins</h4>
+                <div>
+                    <input type="number" id="halfdollars">
+                    <p>^ Half Dollars ^</p>
+                </div>
+                <div>
+                    <input type="number" id="quarters">
+                    <p>^ Quarters ^</p>
+                </div>
+                <div>
+                    <input type="number" id="dimes">
+                    <p>^ Dimes ^</p>
+                </div>
+                <div>
+                    <input type="number" id="nickels">
+                    <p>^ Nickels ^</p>
+                </div>
+                <div>
+                    <input type="number" id="pennies">
+                    <p>^ Pennies ^</p>
+                </div>
+            </div>
+        </center>
+    </div>
+    <center>
+        <div>
+            <input type="number" id="withdraw">
+            <p>^ Amount to Withdraw ^</p>
+        </div>
+        <div>
+            <button type="button" id="BtnCalc">Calculate</button>
+        </div>
+        <p id="totalDeposit">Total Deposit</p>
+        <p id="finalDeposit">Final Deposit</p>
+    </center>
+</body>
+
+</html>
