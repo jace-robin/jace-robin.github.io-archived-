@@ -92,10 +92,10 @@
                                 var sensorsList = ""
                                 $('#sensors').html(Object.keys(data).length +
                                     " sensors found!");
-                                for (let i = 0; i < Object.keys(data).length - 1; i++) {
-                                    var html = "<li><a href=\"" + sensorsPath + "temp" +
-                                        "\">" + data["temp"].name + "</a></li>";
-                                    sensorsList += data[i]
+                                for (var key in data) {
+                                    var html = "<li><a href=\"" + sensorsPath + key +
+                                        "\">" + data[key].name + "</a></li>";
+                                    sensorsList += html
                                 }
                                 $('#sensors-list').html(sensorsList);
                             },
