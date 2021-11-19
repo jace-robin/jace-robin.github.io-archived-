@@ -10,4 +10,6 @@ process.on('SIGINT', function () {
 	process.exit();
 });
 var pirPlugin = require('./plugins/internal/pirPlugin');
+var dhtPlugin = require('./plugins/internal/dhtPlugin');
 pirPlugin.start({});
+dhtPlugin.start({});
