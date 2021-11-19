@@ -4,10 +4,8 @@ var sensorRoutes = require('./../routes/sensors');
 var actuatorRoutes = require('./../routes/actuators');
 var app = express();
 app.use(cors());
-router.route('/pi/actuators').get(function (req, res, next) {
-	res.send(resources.pi.actuator);
-});
 app.use('/pi/sensors', sensorRoutes);
+app.use('/pi/actuators', actuatorRoutes);
 module.exports = app;
 app.get('/', function (req, res) {
 	res.send('Some response for accessing the root');
