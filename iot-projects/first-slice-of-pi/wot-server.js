@@ -7,9 +7,10 @@ const server = httpServer.listen(resources.pi.port, function () {
 
 process.on('SIGINT', function () {
 	pirPlugin.stop();
+	dhtPlugin.stop();
 	process.exit();
 });
 var pirPlugin = require('./plugins/internal/pirPlugin');
 var dhtPlugin = require('./plugins/internal/dhtPlugin');
 pirPlugin.start({});
-dhtPlugin.start({});
+dhtPlugin.start({'frequency': 2000});
