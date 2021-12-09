@@ -11,6 +11,6 @@ app.get('/', function (req, res) {
 	res.send('Some response for accessing the root');
 });
 app.get('/pi', function (req, res) {
-	res.send('Some response for accessing the root');
+	res.send('Some response for accessing the root/pi');
 });
 // I have looked through all files ip: 192.168.68.249
