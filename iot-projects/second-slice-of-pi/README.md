@@ -1,194 +1,319 @@
-# second-slice-of-pi
-Add in middleware to handle data format conversion
+# first-slice-of-pi
+set up routes for a server that handles multiple devices attached to a Pi
 
 **Table of Contents**
  
 - [Setup](#setup)
 - [Important Information](#important-information)
 - [Lesson Steps](#lesson-steps)
-    - [TODO 1: Update Server](#todo-1-update-server)
-    - [TODO 2: The Converter](#todo-2-the-converter)
-    - [TODO 3: Modify Sensor Routes](#todo-3-modify-sensor-routes)
-    - [TODO 4: Modify Actuator Routes](#todo-4-modify-actuator-routes)
-    - [TODO 5: Test Web Page](#todo-5-test-web-page)
+    - [TODO 1: Study the File Structure](#todo-1-study-the-file-structure)
+    - [TODO 2: Initial HTTP Server Setup](#todo-2-initial-http-server-setup)
+    - [TODO 3: Sensor Routes](#todo-3-sensor-routes)
+    - [TODO 4: Actuator Routes](#todo-4-actuator-routes)
+    - [TODO 5: PIR Plugin](#todo-5-pir-plugin)
+    - [TODO 6: DHT Plugin](#todo-6-dht-plugin)
 
 ## Setup
-* This project should be completed on your Pi. **DO NOT WORK ON THIS PROJECT UNTIL FIRST SLICE OF PI IS COMPLETED**
+* This project should be completed on your Pi.
 * Open a new terminal on your Pi (putty or otherwise)
 * Enter the command `cd <your GitHub repository's name>` to enter your repository directory
-* Enter the command `cd iot-projects` to enter your iot-projects directory
-* Enter the command `cp -r first-slice-of-pi/* second-slice-of-pi/.` to copy your first-slice-of-pi's work into second-slice-of-pi's directory
-* Enter the command `cd second-slice-of-pi` to enter the new project's directory
-* Run the command `npm install onoff node-dht-sensor express cors epoll body-parser xmlhttprequest node-json2html`
+* Enter the command `cd iot-projects/first-slice-of-pi` to enter this project's directory
+* Run the command `npm install onoff node-dht-sensor express cors epoll` to install the libraries we will be using during this project
+
+## Lesson Steps
+This project is the first of several that will work together to bake a fully-fledged Raspberry Pi system. There will be a lot of pieces all working together, so while you're working, do your best to keep track of how everything interconnects. It might seem daunting at first, with a total of eight files and several folders organizing those files, but learning how each piece relates to one another now will make the next few projects much simpler.
 
 ## Important Information
 You must keep your working code on your Pi. However, you can edit your code on any machine, and then use GitHub (or other methods) to move your changes to your Pi for testing.
 
-**To test your code,** you will need to follow the following steps (for all TODOs except TODO 5).
+**To test your code,** you will need to follow the following steps.
 1. Make certain that your terminal (on your Pi) is in your project directory. `cd` into it if you are not.
 2. Run the command `node wot-server.js`
-3. Open a second terminal
-4. Use `curl` commands to send requests to your running server
+3. Open your browser and go to your Pi's URL. Then you will need to enter `<your Pi's IP address>:8484` into the URL bar (`192.168.1.250:8484`, for example). 
 
-**IMPORTANT NOTE:** If a `curl` command crashes your server, you will need to restart it in the first terminal before sending another `curl` request.
+**IMPORTANT NOTE:** If you are using the browser that runs on your actual Pi, then you can substitute `<your Pi's IP address>` with `localhost` instead.
 
-## Lesson Steps
-This project is the second part of the multi-project undertaking that is setting up a server to allow others to interface with your Pi. For your server itself, you will only be adding in a converter middleware to allow for multiple data formats to be sent back as responses for the server and the necessary changes to support that converter. However, part of this project is writing a script to test that functionality.
+### TODO 1: Study the File Structure
+As mentioned, there are eight files that all work together. Skeletons for all of these files (and in some cases the entire file) have already been provided for you. Before you begin working in them, study how each of these files connects to one another so that you are familiar with the layout and dependencies between files. Below is a brief summary. 
 
-### TODO 1: Update Server
-This is a small step, but an important one. At the top of your **`servers/http.js`** file, import your middleware converter with `require('./../middleware/converter')` and the body-parser library with `require('body-parser')`. 
+The **`resources`** directory contains two files. **`resources.json`** is a JSON file that represents your device. Assuming you have your Pi and its connected hardware set up the way that the [Hardware Tests](https://github.com/OperationSpark/hardware-tests) project instructed, this file is accurate and should not be changed. **`model.js`** serves to export the resources.json file for use by all other files.
 
-Assuming you stored the body-parser library in a variable called `bodyParser`, add the line
+The **`plugins`** directory contains the **`internal`** directory, which in turn contains two files. These files are what manage the behavior of your sensors (and later LEDs). The **`dhtPlugin.js`** file holds the code for the plugin that manages your DHT sensor. The **`pirPlugin.js`** file holds the code for the plugin that manages you PIR sensor.
 
-    app.use(bodyParser.json());
+The **`routes`** directory contains files that handle routing to your sensors, actuators, and intermediate routes. The **`actuators.js`** file manages access to your actuators, whereas **`sensors.js`** manages access to your sensors.
 
-Just before where you tell Express to use cors.
+For now, the **`servers`** directory only contains the **`http.js`** file. This file pulls all of your routes together (plus a few of its own) and sets up your express server.
 
-Finally, at the end of the file (but before the `module.exports`), add in the line
+Lastly, the **`wot-server.js`** file is where you start your plugins and servers. This is also the file that you should run using the command `node wot-server.js` if you want to test your code. Keep in mind that this will only work properly if you are testing it on your Pi.
 
-    app.use(converter());
+Finally, to complete this TODO, write a comment on the last line of the **`http.js`** file that says `// I have looked through all files`
 
-The ordering is important, as by putting body-parser first, you ensure that incoming request data is easily readable during routing or converting (it's how you can get `req.accepts` in the converter file). By putting the converter at the end, it lets the routes pass data into the converter.
+### TODO 2: Initial HTTP Server Setup
+This TODO will take place within the **`servers/http.js`** file. When you first open the file, all you will see are the lines to import the necessary libraries and an export line. 
 
-**IMPORTANT NOTE:** Be extra certain that there are no mistakes on this TODO, as there is no way to test it yet.
+Right now, there are only four Tasks you need to do in this file. 
 
-### TODO 2: The Converter
-First, let's talk about what is actually happening. Whenever someone puts the URL of one of your devices in the browser, your server sends back information about that device to be displayed. What gets sent back is decided on by your server, but by default it is a JSON representation of your device as described in the resources.json file you have, except up to date (i.e., whether or not an LED is on or off).
+1. Initialize the express server immediately after importing it via the line `var app = express();`
+2. Tell your server to use CORS with `app.use(cors());`
+3. Tell the server how to handle GET requests to the root of your device
+4. Tell the server how to handle GET requests to the gateway to your device. 
 
-The first step is to create a converter that will handle sending back responses in the requested data format. This will be in your **`middleware/converter.js`** file. We're only requiring support for two formats, but you can add in more if you want. Just be aware that some formats are harder to work with than others.
-
-#### 2a) Check for Results and Send Default
-The first thing that needs to be done in the converter is to check if there is even a result that needs to be sent back from the server. You can do this with the condition
-
-    if (req.result) {}
-
-If there is not a result to send back, then what you should do instead is call `next()`. Make sure you have this before attempting to process the result with the converter.
-
-If there is a result to send back, then the default behavior should be to send back json data. This can be done with the line 
-
-    res.send(req.result);
-
-#### 2b) Check if HTML is requested and send HTML
-Keeping in mind that JSON is the default behavior (meaning it should only be sent back if no other data format was requested), you should now handle the case of HTML data requests. 
-
-If you have a result to send back, then you can check if HTML is requested with an additional condition:
-
-    if (req.accepts('html')){}
-
-If HTML is requested, then there are two steps you must follow to send that back. 
-
-**2b-i) The tranformation object**
-
-The first is to create a transformation object for **`json2html`** to use when converting the default JSON object into HTML. This object should take on the form:
+For **Task 3**, take a look at the following code:
 
 ```js
-let transform = {'<>': 'div', 'html': [
-    {'<>': 'p', 'html': [
-        {'<>': 'b', 'html': 'Property1: '},
-        {'<>': 'p', 'html': '${property1}'}
-    ]},
-    {'<>': 'p', 'html': [
-        {'<>': 'b', 'html': 'Property2: '},
-        {'<>': 'p', 'html': '${property2}'}
-    ]},
-    {'<>': 'p', 'html': [
-        {'<>': 'b', 'html': 'Property3: '},
-        {'<>': 'p', 'html': '${property3}'}
-    ]}
-]};
+app.get('/', function(req, res){
+    res.send('Some response for accessing the root');
+});
 ```
 
-However, the three properties that you should use are the `name`, `description`, and `value` of whatever device's information you are sending back, which if you look at your resources.json file you will see are properties present in each of your connected devices.
+This code will tell the server how to respond to requests to the root location of `'/'` (your Pi's IP address), which is by sending back a response of `'Some response for accessing the root'`. Essentially, any time someone pings the "home page" of your Pi's URL, this is the response they will get.
 
-Feel free to add on additional properties, or to change up how the information is displayed (i.e. replace `'b'` with `'h1'`, or put the whole thing in a `<ul>` tag and make the information display in list format).
-
-**2b-ii) The transformation**
-
-Once you have your transformation object created, you can send back the HTML using `res.send()`, where the data sent back is generated by a call to `json2html.transform()`. The first argument to **`json2html.transform()`** should be your JSON result, and the second should be your transformation object.
-
-After sending the result, it is good practice to return from the function.
-
-**IMPORTANT NOTE:** This TODO cannot be tested yet, either, so be very careful with it. **However,** after the next TODO is complete, you will be able to test this TODO as well.
-
-### TODO 3: Modify Sensor Routes
-Once you have your converter set up you will need to update your routes to use the converter. First on the list are the sensor routes in **`routes/sensors.js`**.
-
-This step is actually fairly straightforward. Basically, for each of your routes, you should replace the `res.send()` with an assignment to `req.result` and a call to `next()`. i.e.
-
-```js
-res.send(resources.pi.sensors);
-```
-
-would become
-
-```js
-req.result = resources.pi.sensors;
-next();
-```
-
-**This needs to be done for all routes in your `sensors.js` file.**
-
-Why? Well, by doing this you first store a result in the request data that is the JSON format of your device data. When you call `next()`, that's jumping over to the converter (remember how you put `app.use(converter())` after your routes in the `http.js` file), and req is passed along thanks to the Express server.
+For **Task 4**, you should basically do the same thing as you did for Task 3, except this time you want to handle requests to `'/pi'`, which is the top level gateway to your device. In other words, if someone pings the URL of `<your Pi's IP address>:8484/pi`, then whatever you **send** back in response is what they will receive back. **Make certain that you send a different response than you did in the root.**
 
 **TEST YOUR CODE**
 
-Finally, it's time to test your code. To do so, follow the steps listed at the top of these instructions in the **Important Information** section. Then, enter the following `curl` commands into your second terminal. 
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
 
-**WARNING:** If *any* test does not produce the desired response, you *must* find and correct the problem before attempting other tests.
+1. Open your browser at `'<your Pi's IP address>:8484/`. If you see the text response for the root `/`, then everything up through **Task 3** is correct!
+2. Open your browser at `'<your Pi's IP address>:8484/pi`. If you see the text response for the gateway `/pi`, then **Task 4** is correct as well!
 
-1. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/sensors
-    * You should receive HTML code back as a response. If you do not, then you either did not complete this TODO, or there is an error in your TODO 2's converter code. **THIS SHOULD BE FIXED BEFORE PERFORMING ANY OTHER TESTS**
-2. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/sensors/pir
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-3. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/sensors/dht
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-4. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/sensors/dht/temperature
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-5. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/sensors/dht/humidity
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-6. curl -X GET -H "Accept:application/json" localhost:8484/pi/sensors/
-    * If you do not receive json data (an object) back as a response, then that means there is a problem with your converter. 
+**DO NOT PROCEED UNLESS BOTH TESTS PASS**
 
-**DO NOT PROCEED UNLESS ALL TESTS PRODUCE THE DESIRED RESULT**
+### TODO 3: Sensor Routes
+Most of this TODO takes place in the **`routes/sensors.js`** file, though at the end you will also need to update the `http.js` file, so be sure to keep that open.
 
-### TODO 4: Modify Actuator Routes
-Here, just do the same thing for the actuator routes that you did for the sensor routes. Once you've done that, you're ready for testing!
+#### Task 1: Set Up Routes 
+The `sensors.js` file already imports everything you will need, and also exports the constructed router. Your job will be to establish all of the possible sensor routes, of which there are five.
+
+The first is the sensors root, or `'/'`. This is not to be confused with the `'/'` route in the `http.js` file. Because of how we will update the `http.js` file at the end of this TODO, the path to the sensors root is inherent to any of the defined sensor routes, meaning that `'/'` actually refers to `'<your Pi's IP address>:8484/pi/sensors/'`. 
+
+For now, all you will want to do for each of these routes is to return the data stored in the model as defined by `resources.json` and `model.js`. For example, the routes to `'/'` and `'/dht'` (meaning `'/pi/sensors/'` and `'/pi/sensors/dht'`, respectively) would be defined by:
+
+```js
+router.route('/').get(function (req, res, next) {
+	res.send(resources.pi.sensors);
+});
+
+router.route('/dht').get(function (req, res, next) {
+	res.send(resources.pi.sensors.dht);
+});
+```
+
+In addition to those to routes, you should also include routes to `'/dht/temperature'`, `'/dht/humidity'`, and `'/pir'`. That means there should be a total of five routes in this file when you are done.
+
+#### Task 2: Update HTTP Server
+Once you have all the routes in place, go back into the `http.js` file and add in two things. 
+
+1. At the top of the file, you need to import the routes using `var sensorRoutes = require('./../routes/sensors');`. The single `'.'` at the beginning of the string says that the program is looking for the specified file using a relative file path, and the `'..'` says that it needs to start looking in the parent directory of the current file (i.e. one level up from the servers directory).
+2. Just below the already existing line of `app.use(cors());`, add in the line `app.use('/pi/sensors', sensorRoutes);`. This tells the server that it should route all requests to `'<your Pi's IP>:8484/pi/sensors'` or any of its sub-destinations (e.g. `'<your Pi's IP>:8484/pi/sensors/pir'`) through the sensor routes you just defined.
 
 **TEST YOUR CODE**
 
-Before moving on, make certain that these tests also pass. To do so, follow the steps listed at the top of these instructions in the **Important Information** section. Then, enter the following `curl` commands into your second terminal. 
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
 
-1. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/actuators
-    * You should receive HTML code back as a response. If you do not, then the route was not properly updated.
-2. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/actuators/leds
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-3. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/actuators/leds/1
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
-4. curl -X GET -H "Accept:text/HTML" localhost:8484/pi/actuators/leds/2
-    * If you do not receive HTML code back as a response, then you did not update the pir route properly and should take another look.
+1. Open your browser at `'<your Pi's IP address>:8484/sensors`
+2. Open your browser at `'<your Pi's IP address>:8484/sensors/dht`
+3. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/temperature`
+4. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/humidity`
+5. Open your browser at `'<your Pi's IP address>:8484/sensors/pir`
 
-**DO NOT PROCEED UNLESS ALL TESTS PRODUCE THE DESIRED RESULT**
+All of the above URLs should display a condensed object. If you see either a blank page or an error, then it means that the corresponding route was not configure correctly and you should double check what you have written in your code.
 
-### TODO 5: Test Web Page
-To really test your changes to your server, you will need to work in the file **`data-requester.html`**. 
+**DO NOT PROCEED UNLESS ALL TESTS PASS**
 
-#### 5a) Prepare the request
-Inside of the `processForm()` function, you will need to create a new XMLHttpRequest client (i.e. `const xhttp = new XMLHttpRequest()`). You will also need to get the URL that you will be using. Because you are in the processForm function, it is safe to use jQuery to grab the URL from the form. You can do so using the line
+### TODO 4: Actuator Routes
+Most of this TODO takes place in the **`routes/actuators.js`** file, though at the end you will also need to update the `http.js` file, so be sure to keep that open. You are essentially doing the same thing that you did with the sensors, but there is one part that can be handled differently.
 
-    const url = $('#host').val();
+#### Task 1: Set Up Routes
+The `actuators.js` file has the same initial setup as the `sensors.js` file. Setting up the routes here is similar, as well. 
 
-After that use `xhttp.open()` to declare the nature of the request. You should use `"GET"` as your verb, the URL you just got as the URL, and you'll want the request to be asynchronous (it might not even let you send it if it's not).
+This time, there are four routes you need to set up: the root `'/'` (corresponding to `resources.pi.actuators`), `'/leds'`, `'/leds/1'`, and `'/leds/2'`. Both `'/'` and `'/leds'` can be set up the normal way, but there is a way to combine `'/leds/1'` and `'/leds/2'` into a single route, which is especially useful if you plan on adding more LEDs to your device later.
 
-Next, set the requester header with the header of `"Accept"` and the header value of `"text/html"`. This will let the server check for what data type to send back (in this case HTML).
+**Task 1-a:** Set up the `'/'` and `'/leds'` routes the same way you set up all of the "sensors" routes.
 
-Finally, use `xhttp.send()` to send the request.
+**Task 1-b:** Once you've put in the routes for `'/'` and `'/leds'`, you can handle the `'/leds/1'` and `'/leds/2'` routes using the following code:
 
-#### 5b) Handle readystate changes
-You will need to tell the program how to handle changes to the XMLHttpRequest client's `readyState`. After sending the request, assign to `xhttp.onreadystatechange` a function that accepts no parameters. The body of this function will make use of the readyState and status to decide what to do.
+```js
+router.route('/leds/:id').get(function (req, res, next) {
+	res.send(resources.pi.actuators.leds[req.params.id]);
+});
+```
 
-If the readyState (accessable from the function via `this.readystate`) is `4`, then and only then should you update your page using jQuery.
+Plug that in, and you will be ready to move on to Task 2.
 
-If the status (`this.status`) is `200`, then the data exchange was successful and you should update the page to load the received HTML (`$('#data').html(this.responseText)`). If the status is anything other than `200`, then you should update the page to display "ERROR" in its data element instead.
+#### Task 2: Update HTTP Server
+Once you have all the routes in place, then back in the `http.js` file, you once again need to add in two things. 
 
-#### 5c) Test your page to make sure it and your server work
-Put in various URLs that should be supported by your server. Start up your server using the command `node wot-server.js`. If you're testing directly on your Pi, keep localhost as the root of your URL. If you are testing on a different machine, you will need to put the IP address of your Pi in place of `"localhost"`. If you are getting back information other than `"ERROR"`, congratulations, you've done it!
+1. Import the routes using `var actuatorRoutes = require('./../routes/actuators');`. 
+2. Tell the server to route all requests to `'/pi/actuators'` and sub-destinations through your actuator router with `app.use('/pi/sensors', sensorRoutes);`.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/actuators`
+2. Open your browser at `'<your Pi's IP address>:8484/actuators/leds`
+3. Open your browser at `'<your Pi's IP address>:8484/actuators/leds/1`
+4. Open your browser at `'<your Pi's IP address>:8484/actuators/leds/2`
+
+All of the above URLs should display a condensed object. If you see either a blank page or an error, then it means that the corresponding route was not configure correctly and you should double check what you have written in your code.
+
+**DO NOT PROCEED UNLESS ALL TESTS PASS**
+
+### TODO 5: PIR Plugin
+Currently, you have your server set up to send responses to any GET request your Pi receives, but the data it sends back will not be current. That's because you never set up a connection with any of the hardware (DHT, PIR, or LEDs). We will ignore the LEDs for this project, but both the PIR and DHT sensors need to be handled now. Let's start with the PIR, as it is a simpler device.
+
+In the **`plugins/internal/pirPlugin.js`** file, you will see that the resource model has already been imported and some basic variables defined. One importand variable is the `device` variable, which you see we grab straight from the imported resource model. This contains all of the information about the PIR sensor, and can even be updated using this plugin.
+
+Also note that the `onoff` library has been imported, which you will use to connect to and manage interactions with the PIR sensor. 
+
+Your goal will be to create three functions, then update **`wot-server.js`** to make use of the plugin once it's ready. 
+
+#### Task 1: Connect Hardware
+Create a function with no parameters called `connectHardware`. 
+
+The body of this function should create a new Gpio connection with `new Gpio(device.gpio, 'in', 'both')`. Be sure to save the newly created connection in the `sensor` variable, which is already declared at the global scope. 
+
+The Gpio's watch method should be called, with the callback function defined to accept an error and value parameter (see slides or the [Hardware Tests](https://github.com/OperationSpark/hardware-tests) project if you need a reminder on how to do this). The callback function should check for errors, and if there are no errors then update the model's value using the line 
+
+    device.value = !!value;
+
+which converts `0`'s and `1`'s into true and false, respectively.
+
+#### Task 2: Start
+Create a function to be exported called `start` that accepts a single parameter called `params`. This can be done with the line 
+
+    exports.start = function (params) {};
+
+By creating the function in this way, the `start` function can be used in other files *if* the other files use `require()` to load the `pirPlugin.js` file.
+
+The body of the start function should only do one thing, and that is call the `connectHardware` function.
+
+#### Task 3: Stop
+Create a function to be exported called `stop` that takes no parameters. **Refer to Task 2 to see how to export the function.** 
+
+The body of this function should only call `sensor.unexport()`. That is all.
+
+#### Task 4: Update wot-server.js
+In `wot-server.js`, import the PIR plugin with the line 
+
+    var pirPlugin = require('./plugins/internal/pirPlugin');
+
+Then, start the plugin with the command `pirPlugin.start({});`. **Make sure that you start it *before* you start the server!**
+
+Note that we give an empty object as an argument to `pirPlugin.start()`. That would be used by the `params` parameter in the start function if you made use of it. You don't have to here, but if you wanted to customize the sensor's behavior that is how you would pass in that information to the plugin.
+
+Finally, in `process.on()`'s callback function, add the line
+
+    pirPlugin.stop();
+
+to just before the call to `process.exit()`.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/sensors/pir`
+2. Mess with the PIR sensor. Assuming it is hooked up correctly, it should register your movements.
+3. Refresh your page. You should see that the value of `'value'` in the displayed data is set to `false`. If it does not, try refreshing your page a few more times.
+
+**DO NOT PROCEED UNLESS YOU SEE `value` SET TO FALSE**
+
+### TODO 6: DHT Plugin
+The last thing you need to do is set up your DHT sensor plugin and update the wot-server to use that plugin as well. The process is similar to handling the PIR plugin. Notice once again that there is a `device` variable that grabs the resource model for the DHT sensor. You will use this variable to help interface with the device. Also note the `localParams` and `interval` variables, which you will be using as well.
+
+#### Task 1: Connect Hardware
+Create a function with no parameters called `connectHardware`. Notice that we have a variable called `sensor` already declared for you in the global scope, as you will need to use that variable. 
+
+**Task 1-a:**
+
+In the body of `connectHardware`, you will first need to define the value of `sensor` (recall that this variable has already been created, so **don't make a new variable**). Set `sensor` equal to an object with the following properties:
+
+1. **initialize** : a function with the following properties:
+ - The function takes no parameters
+ - The function does not return any value
+ - The function only calls `sensorDriver.initialize(device.model, device.gpio)`, which sets up the connection with your DHT sensor
+
+2. **read** : a function with the following properties:
+ - The function takes no parameters
+ - The function does not return any value
+ - The function updates the device model with the current sensor values (how to do this is described in section **read-function-walkthrough**)
+
+In short, your object should look like:
+
+```js
+{
+    initialize: function(){
+        // initialize function body
+    },
+    read: function(){
+        // read function body
+    }
+}
+```
+
+**read-function-walkthrough:**
+
+To update the model, first you must save the result of reading the sensor values. The function `sensorDriver.read` returns an object with this data in it. To obtain that data, merely call the `sensorDriver.read` function (no arguments) and store the result in a new variable.
+
+Next, use the data obtained from `sensorDriver.read` to update your model. For example, if you saved the data object in a variable called `readout`, you could update the temperature value using the line
+
+    device.temperature.value = parseFloat(readout.temperature);
+
+Finally, make sure that you update both the temperature and the humidity values. To get the humidity value, simply replace the word "temperature" with "humidity" everwhere it occurs in the line of code above.
+
+**Task 1-b:**
+
+Once your sensor object is defined, your `connectHardware` function is nearly complete. Right after the object definition, call both `sensor.initialize()` and `sensor.read()`. Then add the following code:
+
+```js
+    interval = setInterval(function () {
+		sensor.read();
+	}, localParams.frequency);
+```
+
+This sets up an interval that will call `sensor.read()` at the frequency specified by `localParams`.
+
+#### Task 2: Start
+You're now in the home stretch! There's only a few small tasks left to complete. First, create a function to be exported called `start` that accepts a single parameter called `params`. 
+
+**IMPORTANT: If you don't recall how to export a function, refer to TODO 5 - Task 2**
+
+The first line of this function's body should be 
+
+    localParams = params ? params : localParams;
+
+which just says to use the `params` parameter if one was given and use the default value of `localParams` if not.
+
+Then, call the `connectHardware` function.
+
+#### Task 3: Stop
+Create a function to be exported called `stop` that takes no parameters. **Again, if you don't recall how to export a function, refer to TODO 5 - Task 2**
+
+The body of this function should only call `clearInterval(interval)`, and that is it.
+
+#### Task 4: Update wot-server.js
+In `wot-server.js`, import the DHT plugin.
+
+Then, start the plugin with the command `dhtPlugin.start({'frequency': 2000});`, though feel free to change the number if you want the sensor to give updates more or less often than every 2000 milliseconds. 
+
+Finally, in the `process.on()`'s callback function, add the line
+
+    dhtPlugin.stop();
+
+to just before the call to `process.exit()`.
+
+That's it! You've set up a server that provides an interface to multiple devices on your Pi!
+
+Just as a reminder, you use the command `node wot-server.js` if you want to test your code. Again, this will only work properly if you are testing it on your Pi.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/temperature`
+2. Look at the value of `value` in the displayed data. If the value is `0`, then refresh your page. Assuming that your DHT sensor is hooked up correctly, the value should change to a non-zero value.
+3. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/humidity`
+4. Look at the value of `value` in the displayed data. If the value is `0`, then refresh your page. Assuming that your DHT sensor is hooked up correctly, the value should change to a non-zero value.
+
+If you see both the temperature and humidity values changing to a non-zero value, then everything is good and you are done with this project. Don't forget to push it to GitHub!
