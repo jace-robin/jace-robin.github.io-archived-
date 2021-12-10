@@ -1,4 +1,4 @@
-var middleware = require('./../middleware/converter')
+var converter = require('./../middleware/converter')
 var bodyParser = require('body-parser');
 const express = require('express'),
 	cors = require('cors');
