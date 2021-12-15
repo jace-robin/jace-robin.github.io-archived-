@@ -57,7 +57,7 @@
 				const xhttp = new XMLHttpRequest()
 				const url = $('#host').val();
 				xhttp.open("GET", url, true)
-				xhttp.setrequestheader("Accept", 'text/html')
+				xhttp.setRequestHeader("Accept", 'text/html')
 				xhttp.send()
 				xhttp.onreadystatechange = function () {
 					if (this.readyState === 4) {
