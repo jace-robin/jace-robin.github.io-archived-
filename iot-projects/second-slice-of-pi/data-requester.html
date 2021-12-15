@@ -56,17 +56,19 @@
 				// TODO 5: Test Web Page's XMLHttpRequest Client
 				const xhttp = new XMLHttpRequest()
 				const url = $('#host').val();
-				xhttp.open("GET", url, isAsync)
-				e.preventDefault();
-			}
-			xhttp.onreadystatechange = function () {
-				if (this.readyState === 4) {
-					if (this.status === 200) {
-						$('#data').html(this.responseText)
-					} else {
-						$('#data').html("ERROR")
+				xhttp.open("GET", url, true)
+				xhttp.setrequestheader("Accept", 'text/html')
+				xhttp.send()
+				xhttp.onreadystatechange = function () {
+					if (this.readyState === 4) {
+						if (this.status === 200) {
+							$('#data').html(this.responseText)
+						} else {
+							$('#data').html("ERROR")
+						}
 					}
 				}
+				e.preventDefault();
 			}
 			$('#message-form').submit(processForm);
 		})(jQuery);

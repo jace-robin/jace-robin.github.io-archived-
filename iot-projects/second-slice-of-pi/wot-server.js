@@ -13,4 +13,6 @@ process.on('SIGINT', function () {
 var pirPlugin = require('./plugins/internal/pirPlugin');
 var dhtPlugin = require('./plugins/internal/dhtPlugin');
 pirPlugin.start({});
-dhtPlugin.start({'frequency': 2000});
+dhtPlugin.start({
+	'frequency': 2000
+});
