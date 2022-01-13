@@ -1,4 +1,5 @@
 const resources = require('./../../resources/model');
+const Gpio = require("onoff").Gpio
 
 let actuator1, actuator2;
 let model = resources.pi.actuators.leds;
@@ -10,3 +11,34 @@ exports.start = function (params) {
 };
 
 // TODO 1: Complete the ledsPlugin!
+function connectHardware() {
+	actuator1 = new Gpio(model[1].gpio, 'out')
+	actuator2 = new Gpio(model[2].gpio, 'out')
+}
+
+exports.stop = function() {
+	actuator1.write(0)
+	actuator2.write(0)
+	actuator1.unexport()
+	actuator2.unexport()
+}
+
+exports.switchOnOff = {
+	1: function (value) {
+		if (value) {
+			actuator1.write(value)
+		}
+		else {
+			actuator1.write(0)
+		}
+        
+    },
+    2: function (value) {
+		if (value) {
+			actuator2.write(value)
+		}
+		else {
+			actuator2.write(0)
+		}
+    }
+}

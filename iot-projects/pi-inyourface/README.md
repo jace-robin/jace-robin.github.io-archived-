@@ -1,195 +1,319 @@
-# pi-inyourface
-Add in interface support to your Pi server
+# first-slice-of-pi
+set up routes for a server that handles multiple devices attached to a Pi
 
 **Table of Contents**
  
 - [Setup](#setup)
 - [Important Information](#important-information)
 - [Lesson Steps](#lesson-steps)
-    - [TODO 1: LEDs Plugin](#todo-1-leds-plugin)
-    - [TODO 2: Update Routes](#todo-2-update-routes)
-    - [TODO 3: Add WebSockets Server](#todo-3-add-websockets-server)
-    - [TODO 4: Test Web Page](#todo-4-test-web-page)
+    - [TODO 1: Study the File Structure](#todo-1-study-the-file-structure)
+    - [TODO 2: Initial HTTP Server Setup](#todo-2-initial-http-server-setup)
+    - [TODO 3: Sensor Routes](#todo-3-sensor-routes)
+    - [TODO 4: Actuator Routes](#todo-4-actuator-routes)
+    - [TODO 5: PIR Plugin](#todo-5-pir-plugin)
+    - [TODO 6: DHT Plugin](#todo-6-dht-plugin)
 
 ## Setup
-* This project should be completed on your Pi. **DO NOT WORK ON THIS PROJECT UNTIL SECOND SLICE OF PI IS COMPLETED**
+* This project should be completed on your Pi.
 * Open a new terminal on your Pi (putty or otherwise)
 * Enter the command `cd <your GitHub repository's name>` to enter your repository directory
-* Enter the command `cd iot-projects` to enter your iot-projects directory
-* Enter the command `cp -r second-slice-of-pi/* pi-inyourface/.` to copy your completed second-slice-of-pi's work into pi-inyourface's directory
-* Enter the command `cd pi-inyourface` to enter the new project's directory
-* Run the command `npm install websocket lodash onoff node-dht-sensor express cors epoll body-parser xmlhttprequest node-json2html`
+* Enter the command `cd iot-projects/first-slice-of-pi` to enter this project's directory
+* Run the command `npm install onoff node-dht-sensor express cors epoll` to install the libraries we will be using during this project
+
+## Lesson Steps
+This project is the first of several that will work together to bake a fully-fledged Raspberry Pi system. There will be a lot of pieces all working together, so while you're working, do your best to keep track of how everything interconnects. It might seem daunting at first, with a total of eight files and several folders organizing those files, but learning how each piece relates to one another now will make the next few projects much simpler.
 
 ## Important Information
 You must keep your working code on your Pi. However, you can edit your code on any machine, and then use GitHub (or other methods) to move your changes to your Pi for testing.
 
-**To test your code,** you will need to follow the following steps (for all TODOs except TODO 5).
+**To test your code,** you will need to follow the following steps.
 1. Make certain that your terminal (on your Pi) is in your project directory. `cd` into it if you are not.
 2. Run the command `node wot-server.js`
-3. Open a second terminal
-4. Use `curl` commands to send requests to your running server
+3. Open your browser and go to your Pi's URL. Then you will need to enter `<your Pi's IP address>:8484` into the URL bar (`192.168.1.250:8484`, for example). 
 
-**IMPORTANT NOTE:** If a `curl` command crashes your server, you will need to restart it in the first terminal before sending another `curl` request.
+**IMPORTANT NOTE:** If you are using the browser that runs on your actual Pi, then you can substitute `<your Pi's IP address>` with `localhost` instead.
 
-## Lesson Steps
-This project is the third part of the multi-project undertaking that is setting up a server to allow others to interface with your Pi. For your server itself, you will be adding in two things: a plugin for communicating with the LEDs, and WebSocket support. You will also update a few other parts of your server to support these new additions.
+### TODO 1: Study the File Structure
+As mentioned, there are eight files that all work together. Skeletons for all of these files (and in some cases the entire file) have already been provided for you. Before you begin working in them, study how each of these files connects to one another so that you are familiar with the layout and dependencies between files. Below is a brief summary. 
 
-Once your server has been updated, you will need to create a test web page for WebSocket support. This will consist of connecting multiple WebSocket clients to your server to listen for updates.
+The **`resources`** directory contains two files. **`resources.json`** is a JSON file that represents your device. Assuming you have your Pi and its connected hardware set up the way that the [Hardware Tests](https://github.com/OperationSpark/hardware-tests) project instructed, this file is accurate and should not be changed. **`model.js`** serves to export the resources.json file for use by all other files.
 
-### TODO 1: LEDs Plugin
-Deep in the file **`plugins/internal/ledsPlugin.js`**, you will find that you have already been given the `start()` function for your plugin. You will also see that the `start()` function calls `connectHardware()`, which has not been provided.
+The **`plugins`** directory contains the **`internal`** directory, which in turn contains two files. These files are what manage the behavior of your sensors (and later LEDs). The **`dhtPlugin.js`** file holds the code for the plugin that manages your DHT sensor. The **`pirPlugin.js`** file holds the code for the plugin that manages you PIR sensor.
 
-Your goal here is to create the `connectHardware()` function, as well as to export a `stop()` and a `switchOnOff` object. The connectHardware is the simplest, so let's handle that first.
+The **`routes`** directory contains files that handle routing to your sensors, actuators, and intermediate routes. The **`actuators.js`** file manages access to your actuators, whereas **`sensors.js`** manages access to your sensors.
 
-#### 1a) connectHardware function
-The connectHardware function requires only two things:
+For now, the **`servers`** directory only contains the **`http.js`** file. This file pulls all of your routes together (plus a few of its own) and sets up your express server.
 
-1. Import the `'onoff'` library (although you could import this globally if you prefer, like you do in **`pirPlugin.js`**). 
-2. Create a new Gpio connection in `'out'` mode for both LEDs, and assign each connection to `actuator1` and `actuator2` (both already created globally), respectively. 
+Lastly, the **`wot-server.js`** file is where you start your plugins and servers. This is also the file that you should run using the command `node wot-server.js` if you want to test your code. Keep in mind that this will only work properly if you are testing it on your Pi.
 
-**Hint 1:** The `model` variable stores both LEDs, but you must use bracket notation to access them. For instance, to get the `gpio` value from the first LED, you would write `model[1].gpio`.
+Finally, to complete this TODO, write a comment on the last line of the **`http.js`** file that says `// I have looked through all files`
 
-**Hint 2:** Creating a new Gpio connection in `'out'` mode is exactly the same as you would do for `in` mode, except you don't need to pass in a third parameter for `'out'` mode (i.e., no `'both'` like you do in your `pirPlugin.js` file)
+### TODO 2: Initial HTTP Server Setup
+This TODO will take place within the **`servers/http.js`** file. When you first open the file, all you will see are the lines to import the necessary libraries and an export line. 
 
-#### 1b) stop method
-**The `stop` function should be exported in the same manner that `start` is.** The stop function has two tasks:
+Right now, there are only four Tasks you need to do in this file. 
 
-1. Turn off each LED. This can be done via `LEDGpioConnection.write(0)` for each Gpio connection.
-2. Disconnect from the LEDs using the `unexport()` method, similar to how you do with the pirPlugin's `stop()` method. 
+1. Initialize the express server immediately after importing it via the line `var app = express();`
+2. Tell your server to use CORS with `app.use(cors());`
+3. Tell the server how to handle GET requests to the root of your device
+4. Tell the server how to handle GET requests to the gateway to your device. 
 
-#### 1c) switchOnOff object
-The switchOnOff object is what you will use to turn your LEDs on and off. To do so, you will create a method associated with each LED's number. This will take on a structure similar to:
+For **Task 3**, take a look at the following code:
 
 ```js
-exports.switchOnOff = {
-    1: function (value) {
-        // turn LED 1 on or off based on value
+app.get('/', function(req, res){
+    res.send('Some response for accessing the root');
+});
+```
+
+This code will tell the server how to respond to requests to the root location of `'/'` (your Pi's IP address), which is by sending back a response of `'Some response for accessing the root'`. Essentially, any time someone pings the "home page" of your Pi's URL, this is the response they will get.
+
+For **Task 4**, you should basically do the same thing as you did for Task 3, except this time you want to handle requests to `'/pi'`, which is the top level gateway to your device. In other words, if someone pings the URL of `<your Pi's IP address>:8484/pi`, then whatever you **send** back in response is what they will receive back. **Make certain that you send a different response than you did in the root.**
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/`. If you see the text response for the root `/`, then everything up through **Task 3** is correct!
+2. Open your browser at `'<your Pi's IP address>:8484/pi`. If you see the text response for the gateway `/pi`, then **Task 4** is correct as well!
+
+**DO NOT PROCEED UNLESS BOTH TESTS PASS**
+
+### TODO 3: Sensor Routes
+Most of this TODO takes place in the **`routes/sensors.js`** file, though at the end you will also need to update the `http.js` file, so be sure to keep that open.
+
+#### Task 1: Set Up Routes 
+The `sensors.js` file already imports everything you will need, and also exports the constructed router. Your job will be to establish all of the possible sensor routes, of which there are five.
+
+The first is the sensors root, or `'/'`. This is not to be confused with the `'/'` route in the `http.js` file. Because of how we will update the `http.js` file at the end of this TODO, the path to the sensors root is inherent to any of the defined sensor routes, meaning that `'/'` actually refers to `'<your Pi's IP address>:8484/pi/sensors/'`. 
+
+For now, all you will want to do for each of these routes is to return the data stored in the model as defined by `resources.json` and `model.js`. For example, the routes to `'/'` and `'/dht'` (meaning `'/pi/sensors/'` and `'/pi/sensors/dht'`, respectively) would be defined by:
+
+```js
+router.route('/').get(function (req, res, next) {
+	res.send(resources.pi.sensors);
+});
+
+router.route('/dht').get(function (req, res, next) {
+	res.send(resources.pi.sensors.dht);
+});
+```
+
+In addition to those to routes, you should also include routes to `'/dht/temperature'`, `'/dht/humidity'`, and `'/pir'`. That means there should be a total of five routes in this file when you are done.
+
+#### Task 2: Update HTTP Server
+Once you have all the routes in place, go back into the `http.js` file and add in two things. 
+
+1. At the top of the file, you need to import the routes using `var sensorRoutes = require('./../routes/sensors');`. The single `'.'` at the beginning of the string says that the program is looking for the specified file using a relative file path, and the `'..'` says that it needs to start looking in the parent directory of the current file (i.e. one level up from the servers directory).
+2. Just below the already existing line of `app.use(cors());`, add in the line `app.use('/pi/sensors', sensorRoutes);`. This tells the server that it should route all requests to `'<your Pi's IP>:8484/pi/sensors'` or any of its sub-destinations (e.g. `'<your Pi's IP>:8484/pi/sensors/pir'`) through the sensor routes you just defined.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/sensors`
+2. Open your browser at `'<your Pi's IP address>:8484/sensors/dht`
+3. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/temperature`
+4. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/humidity`
+5. Open your browser at `'<your Pi's IP address>:8484/sensors/pir`
+
+All of the above URLs should display a condensed object. If you see either a blank page or an error, then it means that the corresponding route was not configure correctly and you should double check what you have written in your code.
+
+**DO NOT PROCEED UNLESS ALL TESTS PASS**
+
+### TODO 4: Actuator Routes
+Most of this TODO takes place in the **`routes/actuators.js`** file, though at the end you will also need to update the `http.js` file, so be sure to keep that open. You are essentially doing the same thing that you did with the sensors, but there is one part that can be handled differently.
+
+#### Task 1: Set Up Routes
+The `actuators.js` file has the same initial setup as the `sensors.js` file. Setting up the routes here is similar, as well. 
+
+This time, there are four routes you need to set up: the root `'/'` (corresponding to `resources.pi.actuators`), `'/leds'`, `'/leds/1'`, and `'/leds/2'`. Both `'/'` and `'/leds'` can be set up the normal way, but there is a way to combine `'/leds/1'` and `'/leds/2'` into a single route, which is especially useful if you plan on adding more LEDs to your device later.
+
+**Task 1-a:** Set up the `'/'` and `'/leds'` routes the same way you set up all of the "sensors" routes.
+
+**Task 1-b:** Once you've put in the routes for `'/'` and `'/leds'`, you can handle the `'/leds/1'` and `'/leds/2'` routes using the following code:
+
+```js
+router.route('/leds/:id').get(function (req, res, next) {
+	res.send(resources.pi.actuators.leds[req.params.id]);
+});
+```
+
+Plug that in, and you will be ready to move on to Task 2.
+
+#### Task 2: Update HTTP Server
+Once you have all the routes in place, then back in the `http.js` file, you once again need to add in two things. 
+
+1. Import the routes using `var actuatorRoutes = require('./../routes/actuators');`. 
+2. Tell the server to route all requests to `'/pi/actuators'` and sub-destinations through your actuator router with `app.use('/pi/sensors', sensorRoutes);`.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/actuators`
+2. Open your browser at `'<your Pi's IP address>:8484/actuators/leds`
+3. Open your browser at `'<your Pi's IP address>:8484/actuators/leds/1`
+4. Open your browser at `'<your Pi's IP address>:8484/actuators/leds/2`
+
+All of the above URLs should display a condensed object. If you see either a blank page or an error, then it means that the corresponding route was not configure correctly and you should double check what you have written in your code.
+
+**DO NOT PROCEED UNLESS ALL TESTS PASS**
+
+### TODO 5: PIR Plugin
+Currently, you have your server set up to send responses to any GET request your Pi receives, but the data it sends back will not be current. That's because you never set up a connection with any of the hardware (DHT, PIR, or LEDs). We will ignore the LEDs for this project, but both the PIR and DHT sensors need to be handled now. Let's start with the PIR, as it is a simpler device.
+
+In the **`plugins/internal/pirPlugin.js`** file, you will see that the resource model has already been imported and some basic variables defined. One importand variable is the `device` variable, which you see we grab straight from the imported resource model. This contains all of the information about the PIR sensor, and can even be updated using this plugin.
+
+Also note that the `onoff` library has been imported, which you will use to connect to and manage interactions with the PIR sensor. 
+
+Your goal will be to create three functions, then update **`wot-server.js`** to make use of the plugin once it's ready. 
+
+#### Task 1: Connect Hardware
+Create a function with no parameters called `connectHardware`. 
+
+The body of this function should create a new Gpio connection with `new Gpio(device.gpio, 'in', 'both')`. Be sure to save the newly created connection in the `sensor` variable, which is already declared at the global scope. 
+
+The Gpio's watch method should be called, with the callback function defined to accept an error and value parameter (see slides or the [Hardware Tests](https://github.com/OperationSpark/hardware-tests) project if you need a reminder on how to do this). The callback function should check for errors, and if there are no errors then update the model's value using the line 
+
+    device.value = !!value;
+
+which converts `0`'s and `1`'s into true and false, respectively.
+
+#### Task 2: Start
+Create a function to be exported called `start` that accepts a single parameter called `params`. This can be done with the line 
+
+    exports.start = function (params) {};
+
+By creating the function in this way, the `start` function can be used in other files *if* the other files use `require()` to load the `pirPlugin.js` file.
+
+The body of the start function should only do one thing, and that is call the `connectHardware` function.
+
+#### Task 3: Stop
+Create a function to be exported called `stop` that takes no parameters. **Refer to Task 2 to see how to export the function.** 
+
+The body of this function should only call `sensor.unexport()`. That is all.
+
+#### Task 4: Update wot-server.js
+In `wot-server.js`, import the PIR plugin with the line 
+
+    var pirPlugin = require('./plugins/internal/pirPlugin');
+
+Then, start the plugin with the command `pirPlugin.start({});`. **Make sure that you start it *before* you start the server!**
+
+Note that we give an empty object as an argument to `pirPlugin.start()`. That would be used by the `params` parameter in the start function if you made use of it. You don't have to here, but if you wanted to customize the sensor's behavior that is how you would pass in that information to the plugin.
+
+Finally, in `process.on()`'s callback function, add the line
+
+    pirPlugin.stop();
+
+to just before the call to `process.exit()`.
+
+**TEST YOUR CODE**
+
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/sensors/pir`
+2. Mess with the PIR sensor. Assuming it is hooked up correctly, it should register your movements.
+3. Refresh your page. You should see that the value of `'value'` in the displayed data is set to `false`. If it does not, try refreshing your page a few more times.
+
+**DO NOT PROCEED UNLESS YOU SEE `value` SET TO FALSE**
+
+### TODO 6: DHT Plugin
+The last thing you need to do is set up your DHT sensor plugin and update the wot-server to use that plugin as well. The process is similar to handling the PIR plugin. Notice once again that there is a `device` variable that grabs the resource model for the DHT sensor. You will use this variable to help interface with the device. Also note the `localParams` and `interval` variables, which you will be using as well.
+
+#### Task 1: Connect Hardware
+Create a function with no parameters called `connectHardware`. Notice that we have a variable called `sensor` already declared for you in the global scope, as you will need to use that variable. 
+
+**Task 1-a:**
+
+In the body of `connectHardware`, you will first need to define the value of `sensor` (recall that this variable has already been created, so **don't make a new variable**). Set `sensor` equal to an object with the following properties:
+
+1. **initialize** : a function with the following properties:
+ - The function takes no parameters
+ - The function does not return any value
+ - The function only calls `sensorDriver.initialize(device.model, device.gpio)`, which sets up the connection with your DHT sensor
+
+2. **read** : a function with the following properties:
+ - The function takes no parameters
+ - The function does not return any value
+ - The function updates the device model with the current sensor values (how to do this is described in section **read-function-walkthrough**)
+
+In short, your object should look like:
+
+```js
+{
+    initialize: function(){
+        // initialize function body
     },
-    2: function (value) {
-        // turn LED 2 on or off based on value
+    read: function(){
+        // read function body
     }
 }
 ```
 
-To actually turn on/off the LED, you will need to use the `.write()` function (like you did in `stop()`). A `1` means to turn the LED on and a `0` means to turn it off. 
+**read-function-walkthrough:**
 
-**WARNING:** The `value` you receive as an argument to your functions may be a Boolean, so you will have to use either explicit conditionals (`if`/`else`) or the ternary conditional (`<condition> ? <true response> : <false response>`) to handle this.
+To update the model, first you must save the result of reading the sensor values. The function `sensorDriver.read` returns an object with this data in it. To obtain that data, merely call the `sensorDriver.read` function (no arguments) and store the result in a new variable.
 
-**IMPORTANT NOTE:** Be extra careful during this TODO, as you will not be able to test your code until TODO 2 is completed.
+Next, use the data obtained from `sensorDriver.read` to update your model. For example, if you saved the data object in a variable called `readout`, you could update the temperature value using the line
 
-### TODO 2: Update Routes
+    device.temperature.value = parseFloat(readout.temperature);
 
-#### actuators.js
-The only routes you will need to update are the actuator routes. First, be sure to import the plugin you just created at the top of the file using `ledsPlugin = require('./../plugins/internal/ledsPlugin');`.
+Finally, make sure that you update both the temperature and the humidity values. To get the humidity value, simply replace the word "temperature" with "humidity" everwhere it occurs in the line of code above.
 
-Now, the only route you will need to update is the `'/leds/:id'` route. Because you want to be able to send signals to the LED, you will need to add PUT support. You can do this by appending `.put(function(req, res, next){})` to the current route command. In short, your route should look similar to this:
+**Task 1-b:**
 
-    router.route('/leds/:id').get(...).put(...);
-
-The callback function for the `.put()` method should update the specified LED's value. You should know from the `.get()` method how to reach the LED's representation in the resources object. You can update it by assigning its `value` property the value passed in through the request body (i.e. `req.body.value`);
-
-Once you've updated the LED's value, you need to set `req.result` to have the value of the specified LED.
-
-Next, call `ledsPlugin.switchOnOff[req.params.id](req.body.value);`. This will call the correct version of the switchOnOff method you created in your ledsPlugin, while passing in the value you want to set your LEDs state to (i.e., on or off).
-
-Finally, call `next()` to finish updating your routes.
-
-#### wot-server.js
-Once you've updated your routes, you'll need to update the wot-server to handle startup and shutdown of your new ledsPlugin.
-
-First, import the plugin using `require`.
-Second, call the `start` method for your ledsPlugin.
-Finally, call the `stop` method for your plugin.
-
-Each of these steps should be done where the corresponding steps are for the other plugins that you are using.
-
-At this point, you will be ready to test your server using CURL to send PUT messages to your device. If all go well, you will be able to turn on and off your LEDs at will!
-
-**TEST YOUR CODE**
-
-To test your code, run the following command in the bash terminal *after* starting up your wot-server.
-
-    curl -X PUT -H "Content-Type:application/json" -d '{"value": <true or false>}' url.to.led
-
-Where your value must be either `true` or `false` and `url.to.led` is the actual url to your led (use `localhost:port-number/pi/...`)
-
-For example, IP address aside, this should turn on one of your leds
-
-    curl -X PUT -H "Content-Type:application/json" -d '{"value": true}' http://192.168.1.250:8484/pi/actuators/leds/1
-
-**Run the following four tests to make certain that your code works.**
-
-1. A curl command that turns *on* LED 1
-2. A curl command that turns *on* LED 2
-3. A curl command that turns *off* LED 1
-4. A curl command that turns *off* LED 2
-
-### TODO 3: Add WebSockets Server
-So far, you've added in all the support you need to allow communication with your devices, be that sending commands are requesting information. Now, it's time to add in support for real-time updates from your server, so that clients can subscribe to your devices and monitor their conditions.
-
-In `servers/websockets.js`, you will find much of the code you need to execute the WebSocket server already provided. Your job is to construct the body of the `wss.on()` method's callback function.
-
-**Step 1**
-Get the specific URL the client wants to subscribe to by copying it from `req.url`.
-
-**Step 2**
-Find the resource that matches that URL. The provided function `selectResource(url)` returns a resource if it is given a valid URL, and `undefined` if the URL is invalid. **Store the result of `selectResource` in a variable for later.
-
-**Step 3**
-If the URL was invalid, print an error warning to the console and exit from the function (use `return` and give no value).
-
-**Step 4**
-Use the provided `utils.monitor()` function to watch the specified resource for the client. `utils.monitor()` takes three arguments. The first is the resource location, which you should have obtained from `selectResource()`; the second is the refreshRate (defined at the beginning of the file); the third is a callback function.
-
-The callback function takes one parameter called `changes`. The body of the callback function should simply be
-
-    ws.send(JSON.stringify(changes));
-
-which will send back to the client a list of all changes that occurred to the resource since the last time it was checked.
-
-**Step 5**
-Update `wot-server.js` once again. This time, start by importing the websockets server (located at `"./servers/websockets"`).
-
-Finally, place the line
-
-    <websocketServer-variable-name>.listen(server);
-
-inside of the callback function for `httpServer.listen()`.
-
-**IMPORTANT NOTE:** This is another TODO that you will not be able to test immediately, so make sure you are mindful of your changes so that you will know where to go back and look if TODO 4's tests fail.
-
-### TODO 4: Test Web Page
-Most of the test web page has been provided for you in the file **`ws_client.html`**. However, you need to construct a "connect" function that will create WebSocket clients to connect to your server.
-
-**Step 1**
-
-Inside of your `connect()` function, create a new WebSocket client with the line
-
-    var socket = new WebSocket(url);
-
-**Step 2**
-
-Create a `socket.onopen` method as follows:
+Once your sensor object is defined, your `connectHardware` function is nearly complete. Right after the object definition, call both `sensor.initialize()` and `sensor.read()`. Then add the following code:
 
 ```js
-socket.onopen = function (event) {
-    console.log("OPENED CONNECTION");
-    $(updateElement).html("<h4>Awaiting update<h4>");
-}
+    interval = setInterval(function () {
+		sensor.read();
+	}, localParams.frequency);
 ```
 
-**Step 3**
+This sets up an interval that will call `sensor.read()` at the frequency specified by `localParams`.
 
-Create a `socket.onmessage` method. This will be just like the `onopen` method. However, you can now use the provided `event` to obtain the data you need to display via `let result = JSON.parse(event.data);`. This method should update your HTML to display the received information, which will be stored in `result.value`.
+#### Task 2: Start
+You're now in the home stretch! There's only a few small tasks left to complete. First, create a function to be exported called `start` that accepts a single parameter called `params`. 
 
-**Step 4**
+**IMPORTANT: If you don't recall how to export a function, refer to TODO 5 - Task 2**
 
-Create a `socket.onerror` method in exactly the same way as you created the `onopen` method, but update the messages displayed to be more appropriate (also, the incoming parameter should be called `error`).
+The first line of this function's body should be 
 
-**Step 5**
+    localParams = params ? params : localParams;
 
-Make sure that all of the URLs in your test web page are correct (lines 60-62 by default), and then test your server/client pair!
+which just says to use the `params` parameter if one was given and use the default value of `localParams` if not.
+
+Then, call the `connectHardware` function.
+
+#### Task 3: Stop
+Create a function to be exported called `stop` that takes no parameters. **Again, if you don't recall how to export a function, refer to TODO 5 - Task 2**
+
+The body of this function should only call `clearInterval(interval)`, and that is it.
+
+#### Task 4: Update wot-server.js
+In `wot-server.js`, import the DHT plugin.
+
+Then, start the plugin with the command `dhtPlugin.start({'frequency': 2000});`, though feel free to change the number if you want the sensor to give updates more or less often than every 2000 milliseconds. 
+
+Finally, in the `process.on()`'s callback function, add the line
+
+    dhtPlugin.stop();
+
+to just before the call to `process.exit()`.
+
+That's it! You've set up a server that provides an interface to multiple devices on your Pi!
+
+Just as a reminder, you use the command `node wot-server.js` if you want to test your code. Again, this will only work properly if you are testing it on your Pi.
 
 **TEST YOUR CODE**
 
-To test your code, make sure that you restart your wot-server, then open up `ws_client.html` using live server (or directly in the browser). If it works, then you will see the values of your sensors displaying on the web page.
+To test your code at this point, follow the steps listed at the top of these instructions in the **Important Information** section. Then, do the following.
+
+1. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/temperature`
+2. Look at the value of `value` in the displayed data. If the value is `0`, then refresh your page. Assuming that your DHT sensor is hooked up correctly, the value should change to a non-zero value.
+3. Open your browser at `'<your Pi's IP address>:8484/sensors/dht/humidity`
+4. Look at the value of `value` in the displayed data. If the value is `0`, then refresh your page. Assuming that your DHT sensor is hooked up correctly, the value should change to a non-zero value.
+
+If you see both the temperature and humidity values changing to a non-zero value, then everything is good and you are done with this project. Don't forget to push it to GitHub!
