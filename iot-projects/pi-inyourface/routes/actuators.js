@@ -1,4 +1,4 @@
-const ledsPlugin = require('./plugins/internal/ledsPlugin');
+const ledsPlugin = require('./..plugins/internal/ledsPlugin');
 const express = require('express'),
 	router = express.Router(),
 	resources = require('./../resources/model');
