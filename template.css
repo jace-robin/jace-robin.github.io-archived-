@@ -12,7 +12,7 @@
                 max-width: 800px;
                 margin: auto;
             }
-    
+
             /* navigation menu */
             nav {
                 background: rgb(130, 69, 181);
@@ -39,7 +39,7 @@
                 text-decoration: none;
                 color: #fff;
             }
-    
+
             /* main container area beneath menu */
             main {
                 background: rgb(245, 238, 219);
@@ -65,15 +65,9 @@
             
             #portfolio li:hover {
                 background: #eee;
-            } 
+            }
             
             #portfolio a {
                 text-decoration: none;
                 color: #454545;
-            }
-            h1 {
-                color: black;
-            }
-            h1 hover {
-                
             }

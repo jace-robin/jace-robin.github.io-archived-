@@ -3,7 +3,7 @@ $(document).ready(runProgram);
 
 function runProgram() {
 
-//objects
+    //objects
     var Game = {
         money: 0,
         clickValue: 1,
@@ -27,28 +27,33 @@ function runProgram() {
         },
     };
     var clickValue = 1;
-//functions
-$("#click").on('click', function (){
-    Game.money += clickValue;
-    $("#moneycount").text(Game.money + " Dollars Earned");
-});
+    //functions
+    $("#click").on('click', function () {
+        Game.money += clickValue;
+        $("#moneycount").text(Game.money + " Dollars Earned");
+    });
 
-function tEdit (id, text) {
-    $(id).text(text);
-}
-function addMoney(amount) {
-    Game.money += amount;
-}
-function takeMoney(amount) {
-    Game.money -= amount;
-}
-function addBuilding (building, amount) {
-    Game.buildings[building] += amount;
-}
-function buildingCost (building) {
-    return Math.round(Game.buildings[building].amount * 1.25) + Game.buildings[building].baseCost;
-}
-function click(id) {
-    Game.objects.click.response();
-}
+    function tEdit(id, text) {
+        $(id).text(text);
+    }
+
+    function addMoney(amount) {
+        Game.money += amount;
+    }
+
+    function takeMoney(amount) {
+        Game.money -= amount;
+    }
+
+    function addBuilding(building, amount) {
+        Game.buildings[building] += amount;
+    }
+
+    function buildingCost(building) {
+        return Math.round(Game.buildings[building].amount * 1.25) + Game.buildings[building].baseCost;
+    }
+
+    function click(id) {
+        Game.objects.click.response();
+    }
 }
