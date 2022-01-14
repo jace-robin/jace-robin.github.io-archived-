@@ -21,5 +21,4 @@ router.route('/leds/:id').get(function (req, res, next) {
 	next()
 });
 
-
 module.exports = router;

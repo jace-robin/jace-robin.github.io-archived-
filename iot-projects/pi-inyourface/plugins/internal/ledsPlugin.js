@@ -16,7 +16,7 @@ function connectHardware() {
 	actuator2 = new Gpio(model[2].gpio, 'out')
 }
 
-exports.stop = function() {
+exports.stop = function () {
 	actuator1.write(0)
 	actuator2.write(0)
 	actuator1.unexport()
@@ -25,20 +25,9 @@ exports.stop = function() {
 
 exports.switchOnOff = {
 	1: function (value) {
-		if (value) {
-			actuator1.write(value)
-		}
-		else {
-			actuator1.write(0)
-		}
-        
-    },
-    2: function (value) {
-		if (value) {
-			actuator2.write(value)
-		}
-		else {
-			actuator2.write(0)
-		}
-    }
+		actuator1.write(value ? 1 : 0)
+	},
+	2: function (value) {
+		actuator2.write(value ? 1 : 0)
+	}
 }
