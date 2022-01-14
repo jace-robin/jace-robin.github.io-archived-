@@ -5,11 +5,21 @@ var WebSocketServer = require('ws').Server,
 var refreshRate = 10;
 
 exports.listen = function (server) {
-	var wss = new WebSocketServer({server: server});
+	var wss = new WebSocketServer({
+		server: server
+	});
 	console.log("WebSocket server started");
 	wss.on('connection', function (ws, req) {
 		// TODO 3: Construct a callback for handling client subscription requests
-		
+		let url = req.url
+		let urlResource = selectResource(url);
+		if (!urlResource) {
+			console.log("URL RESOURCE FROM '" + url + "' IS INVALID")
+			return;
+		}
+		utils.monitor(urlResource, refreshRate, function (changes) {
+			ws.send(JSON.stringify(changes));
+		})
 	});
 };
 
@@ -23,5 +33,3 @@ function selectResource(url) {
 	}
 	return result;
 }
-
-

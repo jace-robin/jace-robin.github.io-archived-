@@ -4,7 +4,7 @@
 <head>
 	<title>WebSockets Client</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	
+
 	<style>
 		body {
 			color: rgb(45, 45, 45);
@@ -21,6 +21,7 @@
 			border: 4px solid green;
 			border-radius: 20px;
 		}
+
 		header {
 			font-size: 1.5em;
 			font-weight: bold;
@@ -37,37 +38,49 @@
 	<div id="top">
 		<header>WebSockets Client</header>
 	</div>
-	
+
 	<div>
 		<h4> Temperature </h4>
 		<p id="temp"></p>
 	</div>
-	
+
 	<div>
 		<h4> Humidity </h4>
 		<p id="humidity"></p>
 	</div>
-	
+
 	<div>
 		<h4> PIR </h4>
 		<p id="pir"></p>
 	</div>
-	
+
 	<script type="text/javascript">
+		$(document).ready(function () {
 
-	$(document).ready(function () {
+			connect("ws://localhost:8484/pi/sensors/dht/temperature", "#temp");
+			connect("ws://localhost:8484/pi/sensors/dht/humidity", "#humidity");
+			connect("ws://localhost:8484/pi/sensors/pir", "#pir");
 
-		connect("ws://localhost:8484/pi/sensors/dht/temperature", "#temp");
-		connect("ws://localhost:8484/pi/sensors/dht/humidity", "#humidity");
-		connect("ws://localhost:8484/pi/sensors/pir", "#pir");
-
-		function connect(url, updateElement) {
-			// TODO 4: Create new WebSocket client connections
-			
-		}
-	});
-
+			function connect(url, updateElement) {
+				// TODO 4: Create new WebSocket client connections
+				var socket = new WebSocket(url);
+				socket.onopen = function (event) {
+					console.log("OPENED CONNECTION");
+					$(updateElement).html("<h4>Awaiting update<h4>");
+				}
+				socket.onmessage = function (event) {
+					let message = JSON.parse(event.data);
+					console.log("RECEIVED MESSAGE: " + message.value);
+					$(updateElement).html("<h4>Information Received: " + message.value + "<h4>");
+				}
+				socket.onerror = function () {
+					console.log("ERROR OCCURRED ON WEBSOCKET");
+					$(updateElement).html("<h4>ERROR OCCURRED ON WEBSOCKET<h4>");
+				}
+			}
+		});
 	</script>
 
 </body>
+
 </html>
