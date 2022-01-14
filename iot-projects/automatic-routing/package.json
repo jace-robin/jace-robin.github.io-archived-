@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "epoll": "^4.0.1",
+    "express": "^4.17.2",
+    "lodash": "^4.17.21",
+    "node-dht-sensor": "^0.4.3",
+    "node-json2html": "^2.2.0",
+    "onoff": "^6.0.3",
+    "websocket": "^1.0.34",
+    "ws": "^8.4.1",
+    "xmlhttprequest": "^1.8.0"
+  }
+}
